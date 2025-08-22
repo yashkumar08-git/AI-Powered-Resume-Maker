@@ -66,3 +66,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .bg-image {
+    background-image: url('https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+}
