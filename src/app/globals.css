@@ -6,7 +6,7 @@
   :root {
     --background: 345 30% 10%;
     --foreground: 345 10% 98%;
-    --card: 345 25% 15% / 0.5;
+    --card: transparent;
     --card-foreground: 345 10% 98%;
     --popover: 345 30% 10%;
     --popover-foreground: 345 10% 98%;
@@ -33,7 +33,7 @@
   .dark {
     --background: 345 30% 10%;
     --foreground: 345 10% 98%;
-    --card: 345 25% 15% / 0.5;
+    --card: transparent;
     --card-foreground: 345 10% 98%;
     --popover: 345 30% 10%;
     --popover-foreground: 345 10% 98%;
