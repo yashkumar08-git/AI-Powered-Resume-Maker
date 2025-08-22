@@ -446,7 +446,7 @@ export default function Home() {
                   </AccordionItem>
                 </Accordion>
                 <Button type="submit" size="lg" className="w-full text-lg" disabled={isLoading}>
-                  {isLoading ? 'Generating...' : 'Craft My Application'}
+                  {isLoading ? 'Generating...' : 'Craft My Resume'}
                 </Button>
               </form>
             </Form>
