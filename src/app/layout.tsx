@@ -32,14 +32,12 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
+          <Header />
           <div className="relative flex-grow flex flex-col">
              <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-0" />
-            <div className="relative z-10">
-              <Header />
-            </div>
             <main className="flex-grow relative z-10 h-full">{children}</main>
-            <Footer />
           </div>
+          <Footer />
           <Toaster />
         </AuthProvider>
       </body>
