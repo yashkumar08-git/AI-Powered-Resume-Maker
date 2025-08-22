@@ -63,7 +63,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   );
 
   return (
-    <div className="mt-12 w-full">
+    <div className="mt-12 w-full animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
       <Tabs defaultValue="resume" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <div className="flex-1">

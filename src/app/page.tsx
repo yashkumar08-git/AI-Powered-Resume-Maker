@@ -131,17 +131,17 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
-      <div className="text-center max-w-3xl mx-auto">
+      <div className="text-center max-w-3xl mx-auto animate-fade-in-up">
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground">
           AI-Powered Resume Maker
         </h1>
-        <p className="mt-4 text-lg md:text-xl text-muted-foreground">
+        <p className="mt-4 text-lg md:text-xl text-muted-foreground" style={{ animationDelay: '0.2s' }}>
           Fill in your details, paste a job description, and let our AI craft a
           perfectly tailored resume and cover letter for you.
         </p>
       </div>
 
-      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto shadow-2xl shadow-primary/10 border-primary/20">
+      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto shadow-2xl shadow-primary/10 border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl">
             <Wand2 className="text-primary"/>
