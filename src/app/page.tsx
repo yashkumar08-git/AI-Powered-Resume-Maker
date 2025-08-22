@@ -34,7 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingState } from "@/components/LoadingState";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Calendar, Award } from "lucide-react";
+import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building } from "lucide-react";
 
 const experienceSchema = z.object({
   title: z.string().min(1, "Title is required."),
@@ -130,21 +130,21 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-8 md:py-16">
       <div className="text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
-          Create Your Perfect Resume
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground">
+          AI-Powered Resume Maker
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground">
           Fill in your details, paste a job description, and let our AI craft a
-          perfectly tailored application for you.
+          perfectly tailored resume and cover letter for you.
         </p>
       </div>
 
-      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto shadow-lg">
+      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto shadow-2xl shadow-primary/10 border-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wand2 />
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            <Wand2 className="text-primary"/>
             Let's Get Started
           </CardTitle>
           <CardDescription>
@@ -155,16 +155,16 @@ export default function Home() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-               <Accordion type="multiple" defaultValue={['item-1', 'item-2', 'item-3', 'item-4', 'item-5']} className="w-full">
+               <Accordion type="multiple" defaultValue={['item-1', 'item-5']} className="w-full">
                 <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-lg font-semibold"><FileText className="text-primary mr-2" /> Personal Information</AccordionTrigger>
-                  <AccordionContent className="space-y-4 p-2">
+                  <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
+                  <AccordionContent className="space-y-4 p-4 bg-secondary/30 rounded-md">
                      <FormField
                         control={form.control}
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Full Name</FormLabel>
+                            <FormLabel className="font-semibold">Full Name</FormLabel>
                             <FormControl>
                               <Input placeholder="John Doe" {...field} />
                             </FormControl>
@@ -177,7 +177,7 @@ export default function Home() {
                         name="contact"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Contact Information</FormLabel>
+                            <FormLabel className="font-semibold">Contact Information</FormLabel>
                             <FormControl>
                               <Input placeholder="Email, Phone, LinkedIn URL" {...field} />
                             </FormControl>
@@ -188,16 +188,16 @@ export default function Home() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-lg font-semibold"><Building className="text-primary mr-2" /> Work Experience</AccordionTrigger>
+                  <AccordionTrigger className="text-xl font-semibold"><Building className="text-primary mr-3" /> Work Experience</AccordionTrigger>
                   <AccordionContent className="space-y-6 p-2">
                     {expFields.map((field, index) => (
-                      <div key={field.id} className="p-4 border rounded-md relative space-y-2">
+                      <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-secondary/30">
                          <FormField
                           control={form.control}
                           name={`experiences.${index}.title`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Job Title</FormLabel>
+                              <FormLabel className="font-semibold">Job Title</FormLabel>
                               <FormControl><Input placeholder="Software Engineer" {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -208,7 +208,7 @@ export default function Home() {
                           name={`experiences.${index}.company`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Company</FormLabel>
+                              <FormLabel className="font-semibold">Company</FormLabel>
                               <FormControl><Input placeholder="Tech Inc." {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -219,7 +219,7 @@ export default function Home() {
                           name={`experiences.${index}.dates`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Dates</FormLabel>
+                              <FormLabel className="font-semibold">Dates</FormLabel>
                               <FormControl><Input placeholder="Jan 2022 - Present" {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -230,7 +230,7 @@ export default function Home() {
                           name={`experiences.${index}.description`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Description</FormLabel>
+                              <FormLabel className="font-semibold">Description</FormLabel>
                               <FormControl><Textarea placeholder="Describe your responsibilities and achievements..." {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -243,16 +243,16 @@ export default function Home() {
                   </AccordionContent>
                 </AccordionItem>
                  <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-lg font-semibold"><GraduationCap className="text-primary mr-2" /> Education</AccordionTrigger>
+                  <AccordionTrigger className="text-xl font-semibold"><GraduationCap className="text-primary mr-3" /> Education</AccordionTrigger>
                   <AccordionContent className="space-y-6 p-2">
                     {eduFields.map((field, index) => (
-                       <div key={field.id} className="p-4 border rounded-md relative space-y-2">
+                       <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-secondary/30">
                          <FormField
                           control={form.control}
                           name={`educations.${index}.degree`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Degree / Certificate</FormLabel>
+                              <FormLabel className="font-semibold">Degree / Certificate</FormLabel>
                               <FormControl><Input placeholder="B.S. in Computer Science" {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -263,7 +263,7 @@ export default function Home() {
                           name={`educations.${index}.school`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>School / University</FormLabel>
+                              <FormLabel className="font-semibold">School / University</FormLabel>
                               <FormControl><Input placeholder="State University" {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -274,7 +274,7 @@ export default function Home() {
                           name={`educations.${index}.year`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Year of Graduation</FormLabel>
+                              <FormLabel className="font-semibold">Year of Graduation</FormLabel>
                               <FormControl><Input placeholder="2021" {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -287,14 +287,14 @@ export default function Home() {
                   </AccordionContent>
                 </AccordionItem>
                  <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-lg font-semibold"><Star className="text-primary mr-2" /> Skills</AccordionTrigger>
-                  <AccordionContent className="p-2">
+                  <AccordionTrigger className="text-xl font-semibold"><Star className="text-primary mr-3" /> Skills</AccordionTrigger>
+                  <AccordionContent className="p-4 bg-secondary/30 rounded-md">
                      <FormField
                       control={form.control}
                       name="skills"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Skills</FormLabel>
+                          <FormLabel className="font-semibold">Skills</FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="List your skills, separated by commas (e.g., JavaScript, React, Node.js)..."
@@ -309,14 +309,14 @@ export default function Home() {
                   </AccordionContent>
                 </AccordionItem>
                  <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-lg font-semibold"><Briefcase className="text-primary mr-2" /> Job Description</AccordionTrigger>
-                  <AccordionContent className="p-2">
+                  <AccordionTrigger className="text-xl font-semibold"><Briefcase className="text-primary mr-3" /> Job Description</AccordionTrigger>
+                  <AccordionContent className="p-4 bg-secondary/30 rounded-md">
                      <FormField
                       control={form.control}
                       name="jobDescription"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Job Description</FormLabel>
+                          <FormLabel className="font-semibold">Job Description</FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Paste the job description here..."
@@ -331,7 +331,7 @@ export default function Home() {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+              <Button type="submit" size="lg" className="w-full text-lg" disabled={isLoading}>
                 {isLoading ? 'Generating...' : 'Craft My Application'}
               </Button>
             </form>
