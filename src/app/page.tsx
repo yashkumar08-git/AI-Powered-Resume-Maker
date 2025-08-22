@@ -153,7 +153,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <div className="text-center max-w-3xl mx-auto animate-fade-in-up">
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground backdrop-blur-sm bg-black/10 rounded-md px-4 py-2 inline-block">
           AI-Powered Resume Maker
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground" style={{ animationDelay: '0.2s' }}>
