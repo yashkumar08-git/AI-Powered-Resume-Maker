@@ -16,7 +16,7 @@ export function Header() {
   };
 
   return (
-    <header className="py-4 px-4 sm:px-6 lg:px-8 border-b bg-white/5 backdrop-blur-sm">
+    <header className="py-4 px-4 sm:px-6 lg:px-8 border-b">
       <div className="container mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="p-2 bg-primary/10 group-hover:bg-primary/20 rounded-full transition-colors">
