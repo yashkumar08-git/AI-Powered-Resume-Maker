@@ -12,17 +12,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, UserCircle, Phone } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, UserCircle, Phone, Brush } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Image from "next/image";
+import { BackgroundSwitcher } from "./BackgroundSwitcher";
 
 interface ResultsDisplayProps {
   result: CustomizeResumeOutput;
+  setBackgroundClass: (className: string) => void;
 }
 
-export function ResultsDisplay({ result }: ResultsDisplayProps) {
+export function ResultsDisplay({ result, setBackgroundClass }: ResultsDisplayProps) {
   const { toast } = useToast();
   const resumeRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
@@ -156,16 +158,19 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
             </p>
           </div>
          
-          <TabsList className="grid w-full max-w-sm grid-cols-2">
-            <TabsTrigger value="resume">
-              <FileText className="mr-2 h-4 w-4" />
-              Customized Resume
-            </TabsTrigger>
-            <TabsTrigger value="cover-letter">
-              <Mail className="mr-2 h-4 w-4" />
-              Cover Letter
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex items-center gap-4">
+            <BackgroundSwitcher setBackgroundClass={setBackgroundClass} />
+            <TabsList className="grid w-full max-w-sm grid-cols-2">
+              <TabsTrigger value="resume">
+                <FileText className="mr-2 h-4 w-4" />
+                Customized Resume
+              </TabsTrigger>
+              <TabsTrigger value="cover-letter">
+                <Mail className="mr-2 h-4 w-4" />
+                Cover Letter
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </div>
         <TabsContent value="resume">
           <Card className="shadow-none bg-white/5">

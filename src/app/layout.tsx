@@ -27,6 +27,7 @@ export default function RootLayout({
         />
       </head>
       <body
+        id="main-body"
         className={cn(
           'min-h-screen bg-background font-body antialiased flex flex-col',
           'bg-image'

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -84,6 +84,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [backgroundClass, setBackgroundClass] = useState('bg-image');
+
+  useEffect(() => {
+    const body = document.getElementById('main-body');
+    if (body) {
+      body.className = body.className.replace(/bg-image-?\w*/g, '');
+      body.classList.add(backgroundClass);
+    }
+  }, [backgroundClass]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -136,6 +145,7 @@ export default function Home() {
     setIsLoading(false);
     if (response.success && response.data) {
       setResult(response.data);
+      setBackgroundClass('bg-image-1');
       toast({
         title: "Success!",
         description: "Your customized documents have been generated.",
@@ -162,226 +172,229 @@ export default function Home() {
         </p>
       </div>
 
-      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto animate-fade-in-up shadow-2xl shadow-primary/10 bg-gradient-to-br from-card to-background/50" style={{ animationDelay: '0.4s' }}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-2xl">
-            <Wand2 className="text-primary"/>
-            Let's Get Started
-          </CardTitle>
-          <CardDescription>
-            Provide your details and the job description to begin the customization
-            process.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-               <Accordion type="multiple" defaultValue={['item-1', 'item-5']} className="w-full">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
-                  <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
-                     <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-semibold">Full Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="contact"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-semibold">Contact Information</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Email, Phone, LinkedIn URL" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormItem>
-                        <FormLabel className="font-semibold">Profile Photo</FormLabel>
-                        <div className="flex items-center gap-4">
-                            <FormControl>
-                                <Input type="file" accept="image/*" className="max-w-xs" onChange={handlePhotoChange} />
-                            </FormControl>
-                            {photoPreview && (
-                                <Image src={photoPreview} alt="Profile preview" width={80} height={80} className="rounded-full object-cover w-20 h-20" />
+      {!result && !isLoading && (
+         <Card className="mt-8 md:mt-12 max-w-4xl mx-auto animate-fade-in-up shadow-2xl shadow-primary/10 bg-gradient-to-br from-card to-background/50" style={{ animationDelay: '0.4s' }}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <Wand2 className="text-primary"/>
+              Let's Get Started
+            </CardTitle>
+            <CardDescription>
+              Provide your details and the job description to begin the customization
+              process.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+                 <Accordion type="multiple" defaultValue={['item-1', 'item-5']} className="w-full">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
+                    <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
+                       <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-semibold">Full Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="contact"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-semibold">Contact Information</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Email, Phone, LinkedIn URL" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormItem>
+                          <FormLabel className="font-semibold">Profile Photo</FormLabel>
+                          <div className="flex items-center gap-4">
+                              <FormControl>
+                                  <Input type="file" accept="image/*" className="max-w-xs" onChange={handlePhotoChange} />
+                              </FormControl>
+                              {photoPreview && (
+                                  <Image src={photoPreview} alt="Profile preview" width={80} height={80} className="rounded-full object-cover w-20 h-20" />
+                              )}
+                              {!photoPreview && (
+                                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                                      <ImageIcon className="text-muted-foreground" />
+                                  </div>
+                              )}
+                          </div>
+                          <FormDescription>
+                            Optional: Upload a professional headshot.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger className="text-xl font-semibold"><Building className="text-primary mr-3" /> Work Experience</AccordionTrigger>
+                    <AccordionContent className="space-y-6 p-2">
+                      {expFields.map((field, index) => (
+                        <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-accent/30">
+                           <FormField
+                            control={form.control}
+                            name={`experiences.${index}.title`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Job Title</FormLabel>
+                                <FormControl><Input placeholder="Software Engineer" {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
                             )}
-                            {!photoPreview && (
-                                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-                                    <ImageIcon className="text-muted-foreground" />
-                                </div>
+                          />
+                           <FormField
+                            control={form.control}
+                            name={`experiences.${index}.company`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Company</FormLabel>
+                                <FormControl><Input placeholder="Tech Inc." {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
                             )}
+                          />
+                           <FormField
+                            control={form.control}
+                            name={`experiences.${index}.dates`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Dates</FormLabel>
+                                <FormControl><Input placeholder="Jan 2022 - Present" {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                           <FormField
+                            control={form.control}
+                            name={`experiences.${index}.description`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Description</FormLabel>
+                                <FormControl><Textarea placeholder="Describe your responsibilities and achievements..." {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          {expFields.length > 1 && <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => removeExp(index)}><Trash2 className="text-destructive" /></Button>}
                         </div>
-                        <FormDescription>
-                          Optional: Upload a professional headshot.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-xl font-semibold"><Building className="text-primary mr-3" /> Work Experience</AccordionTrigger>
-                  <AccordionContent className="space-y-6 p-2">
-                    {expFields.map((field, index) => (
-                      <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-accent/30">
-                         <FormField
-                          control={form.control}
-                          name={`experiences.${index}.title`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Job Title</FormLabel>
-                              <FormControl><Input placeholder="Software Engineer" {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                          control={form.control}
-                          name={`experiences.${index}.company`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Company</FormLabel>
-                              <FormControl><Input placeholder="Tech Inc." {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                          control={form.control}
-                          name={`experiences.${index}.dates`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Dates</FormLabel>
-                              <FormControl><Input placeholder="Jan 2022 - Present" {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                          control={form.control}
-                          name={`experiences.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Description</FormLabel>
-                              <FormControl><Textarea placeholder="Describe your responsibilities and achievements..." {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        {expFields.length > 1 && <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => removeExp(index)}><Trash2 className="text-destructive" /></Button>}
-                      </div>
-                    ))}
-                    <Button type="button" variant="outline" onClick={() => appendExp({ title: "", company: "", dates: "", description: "" })}><PlusCircle className="mr-2" /> Add Experience</Button>
-                  </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-xl font-semibold"><GraduationCap className="text-primary mr-3" /> Education</AccordionTrigger>
-                  <AccordionContent className="space-y-6 p-2">
-                    {eduFields.map((field, index) => (
-                       <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-accent/30">
-                         <FormField
-                          control={form.control}
-                          name={`educations.${index}.degree`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Degree / Certificate</FormLabel>
-                              <FormControl><Input placeholder="B.S. in Computer Science" {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                          control={form.control}
-                          name={`educations.${index}.school`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">School / University</FormLabel>
-                              <FormControl><Input placeholder="State University" {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                          control={form.control}
-                          name={`educations.${index}.year`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Year of Graduation</FormLabel>
-                              <FormControl><Input placeholder="2021" {...field} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        {eduFields.length > 1 && <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => removeEdu(index)}><Trash2 className="text-destructive" /></Button>}
-                       </div>
-                    ))}
-                     <Button type="button" variant="outline" onClick={() => appendEdu({ degree: "", school: "", year: "" })}><PlusCircle className="mr-2" /> Add Education</Button>
-                  </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-xl font-semibold"><Star className="text-primary mr-3" /> Skills</AccordionTrigger>
-                  <AccordionContent className="p-4 bg-accent/30 rounded-md">
-                     <FormField
-                      control={form.control}
-                      name="skills"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-semibold">Skills</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="List your skills, separated by commas (e.g., JavaScript, React, Node.js)..."
-                              className="min-h-[100px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-xl font-semibold"><Briefcase className="text-primary mr-3" /> Job Description</AccordionTrigger>
-                  <AccordionContent className="p-4 bg-accent/30 rounded-md">
-                     <FormField
-                      control={form.control}
-                      name="jobDescription"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-semibold">Job Description</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Paste the job description here..."
-                              className="min-h-[200px] resize-y"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              <Button type="submit" size="lg" className="w-full text-lg" disabled={isLoading}>
-                {isLoading ? 'Generating...' : 'Craft My Application'}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                      ))}
+                      <Button type="button" variant="outline" onClick={() => appendExp({ title: "", company: "", dates: "", description: "" })}><PlusCircle className="mr-2" /> Add Experience</Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                   <AccordionItem value="item-3">
+                    <AccordionTrigger className="text-xl font-semibold"><GraduationCap className="text-primary mr-3" /> Education</AccordionTrigger>
+                    <AccordionContent className="space-y-6 p-2">
+                      {eduFields.map((field, index) => (
+                         <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-accent/30">
+                           <FormField
+                            control={form.control}
+                            name={`educations.${index}.degree`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Degree / Certificate</FormLabel>
+                                <FormControl><Input placeholder="B.S. in Computer Science" {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                           <FormField
+                            control={form.control}
+                            name={`educations.${index}.school`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">School / University</FormLabel>
+                                <FormControl><Input placeholder="State University" {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                           <FormField
+                            control={form.control}
+                            name={`educations.${index}.year`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Year of Graduation</FormLabel>
+                                <FormControl><Input placeholder="2021" {...field} /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          {eduFields.length > 1 && <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => removeEdu(index)}><Trash2 className="text-destructive" /></Button>}
+                         </div>
+                      ))}
+                       <Button type="button" variant="outline" onClick={() => appendEdu({ degree: "", school: "", year: "" })}><PlusCircle className="mr-2" /> Add Education</Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                   <AccordionItem value="item-4">
+                    <AccordionTrigger className="text-xl font-semibold"><Star className="text-primary mr-3" /> Skills</AccordionTrigger>
+                    <AccordionContent className="p-4 bg-accent/30 rounded-md">
+                       <FormField
+                        control={form.control}
+                        name="skills"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-semibold">Skills</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="List your skills, separated by commas (e.g., JavaScript, React, Node.js)..."
+                                className="min-h-[100px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                   <AccordionItem value="item-5">
+                    <AccordionTrigger className="text-xl font-semibold"><Briefcase className="text-primary mr-3" /> Job Description</AccordionTrigger>
+                    <AccordionContent className="p-4 bg-accent/30 rounded-md">
+                       <FormField
+                        control={form.control}
+                        name="jobDescription"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-semibold">Job Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Paste the job description here..."
+                                className="min-h-[200px] resize-y"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                <Button type="submit" size="lg" className="w-full text-lg" disabled={isLoading}>
+                  {isLoading ? 'Generating...' : 'Craft My Application'}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
 
       {isLoading && <LoadingState />}
-      {result && <ResultsDisplay result={result} />}
+      {result && <ResultsDisplay result={result} setBackgroundClass={setBackgroundClass} />}
     </div>
   );
 }

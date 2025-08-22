@@ -6,7 +6,7 @@
   :root {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
-    --card: 220 40% 6% / 0.8;
+    --card: 220 40% 10% / 0.9;
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
@@ -16,7 +16,7 @@
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 220 40% 12% / 0.7;
+    --accent: 220 40% 15% / 0.8;
     --accent-foreground: 210 20% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 20% 98%;
@@ -33,7 +33,7 @@
   .dark {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
-    --card: 220 40% 6% / 0.8;
+    --card: 220 40% 10% / 0.9;
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
@@ -43,7 +43,7 @@
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 220 40% 12% / 0.7;
+    --accent: 220 40% 15% / 0.8;
     --accent-foreground: 210 20% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 20% 98%;
@@ -64,11 +64,33 @@
   }
   body {
     @apply bg-background text-foreground;
+    transition: background-image 0.5s ease-in-out;
   }
   .bg-image {
-    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1507608442429-b0537234a6af?q=80&w=2070&auto=format&fit=crop');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+  }
+  .bg-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1507608442429-b0537234a6af?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+  .bg-image-2 {
+     background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+  .bg-image-3 {
+     background-image: url('https://images.unsplash.com/photo-1488415032362-b7823c9171b8?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+   .bg-image-none {
+    background-image: none;
   }
 }
