@@ -10,13 +10,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail } from "lucide-react";
+import { Download, FileText, Mail, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ResultsDisplayProps {
   result: TailorResumeOutput;
 }
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
+  const { toast } = useToast();
+
   const downloadTextFile = (content: string, filename: string) => {
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -28,14 +31,50 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  
+  const copyToClipboard = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast({
+        title: "Copied to clipboard!",
+    });
+  };
+
+  const DocumentActions = ({ content, filename }: { content: string, filename: string }) => (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => copyToClipboard(content)}
+      >
+        <Copy className="mr-2 h-4 w-4" />
+        Copy
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() =>
+          downloadTextFile(content, filename)
+        }
+      >
+        <Download className="mr-2 h-4 w-4" />
+        Download
+      </Button>
+    </div>
+  );
 
   return (
     <div className="mt-12 w-full">
       <Tabs defaultValue="resume" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Your Tailored Documents
-          </h2>
+          <div className="flex-1">
+             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+                Your Tailored Documents
+            </h2>
+            <p className="text-muted-foreground mt-1">
+                Your resume and cover letter are ready.
+            </p>
+          </div>
+         
           <TabsList className="grid w-full max-w-sm grid-cols-2">
             <TabsTrigger value="resume">
               <FileText className="mr-2 h-4 w-4" />
@@ -48,27 +87,19 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </TabsList>
         </div>
         <TabsContent value="resume">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className="shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between border-b">
               <div>
                 <CardTitle>Tailored Resume</CardTitle>
                 <CardDescription>
                   Optimized for the job description.
                 </CardDescription>
               </div>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  downloadTextFile(result.tailoredResume, "tailored-resume.txt")
-                }
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
+              <DocumentActions content={result.tailoredResume} filename="tailored-resume.txt" />
             </CardHeader>
-            <CardContent>
-              <div className="border rounded-md p-4 bg-secondary/30 h-[500px] overflow-y-auto">
-                <pre className="text-sm whitespace-pre-wrap font-body text-foreground">
+            <CardContent className="p-0">
+              <div className="p-6 bg-background h-[600px] overflow-y-auto">
+                <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
                   {result.tailoredResume}
                 </pre>
               </div>
@@ -76,27 +107,19 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </Card>
         </TabsContent>
         <TabsContent value="cover-letter">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className="shadow-none">
+            <CardHeader className="flex flex-row items-center justify-between border-b">
               <div>
                 <CardTitle>Cover Letter</CardTitle>
                 <CardDescription>
                   A compelling letter to introduce yourself.
                 </CardDescription>
               </div>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  downloadTextFile(result.coverLetter, "cover-letter.txt")
-                }
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
+               <DocumentActions content={result.coverLetter} filename="cover-letter.txt" />
             </CardHeader>
-            <CardContent>
-              <div className="border rounded-md p-4 bg-secondary/30 h-[500px] overflow-y-auto">
-                <pre className="text-sm whitespace-pre-wrap font-body text-foreground">
+            <CardContent className="p-0">
+              <div className="p-6 bg-background h-[600px] overflow-y-auto">
+                <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
                   {result.coverLetter}
                 </pre>
               </div>
