@@ -35,7 +35,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-grow relative">
             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-0" />
-            <div className="relative z-10">{children}</div>
+            <div className="relative z-10 h-full">{children}</div>
           </main>
           <Footer />
           <Toaster />
