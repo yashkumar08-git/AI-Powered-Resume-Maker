@@ -23,6 +23,9 @@ export type CustomizeResumeInput = z.infer<typeof CustomizeResumeInputSchema>;
 
 const ResumeSchema = z.object({
   name: z.string().describe("The user's full name."),
+  professionalTitle: z.string().optional().describe("The user's professional title (e.g., 'Senior Software Engineer')."),
+  location: z.string().optional().describe("The user's location (e.g., 'San Francisco, CA')."),
+  website: z.string().optional().describe("A link to the user's personal website or portfolio."),
   contact: z.string().describe("The user's contact information (email, phone, LinkedIn)."),
   photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI."),
   summary: z.string().describe("A professional summary customized for the job."),

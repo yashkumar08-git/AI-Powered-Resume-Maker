@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, UserCircle, Phone } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, UserCircle, MapPin, Link as LinkIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -184,10 +184,15 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               <div className="p-8 bg-transparent h-[800px] overflow-y-auto">
                 <div ref={resumeRef} className="p-8 bg-white text-black shadow-lg rounded-lg max-w-4xl mx-auto font-sans">
                   {/* Header */}
-                  <div className="flex items-center justify-between border-b-2 border-gray-200 pb-4 mb-6">
+                  <div className="flex items-start justify-between border-b-2 border-gray-200 pb-4 mb-6">
                     <div className="flex-1">
                       <h1 className="text-4xl font-bold text-gray-800">{customizedResume.name}</h1>
-                      <p className="text-md text-gray-600 mt-1">{customizedResume.contact}</p>
+                      {customizedResume.professionalTitle && <p className="text-xl text-primary mt-1">{customizedResume.professionalTitle}</p>}
+                      <div className="text-sm text-gray-600 mt-2 space-y-1">
+                        <p className="flex items-center gap-2">{customizedResume.contact}</p>
+                        {customizedResume.location && <p className="flex items-center gap-2"><MapPin size={14}/> {customizedResume.location}</p>}
+                        {customizedResume.website && <p className="flex items-center gap-2"><LinkIcon size={14}/> <a href={customizedResume.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.website}</a></p>}
+                      </div>
                     </div>
                     {customizedResume.photoDataUri && (
                        <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={100} height={100} className="rounded-full object-cover w-24 h-24" />

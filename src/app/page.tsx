@@ -54,7 +54,10 @@ const educationSchema = z.object({
 
 const formSchema = z.object({
   name: z.string(),
+  professionalTitle: z.string().optional(),
   contact: z.string(),
+  location: z.string().optional(),
+  website: z.string().optional(),
   experiences: z.array(experienceSchema),
   educations: z.array(educationSchema),
   skills: z.string(),
@@ -65,7 +68,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 function assembleResume(values: FormValues): string {
-  let resume = `Name: ${values.name}\nContact: ${values.contact}\n\n`;
+  let resume = `Name: ${values.name}\n`;
+  if(values.professionalTitle) resume += `Professional Title: ${values.professionalTitle}\n`;
+  resume += `Contact: ${values.contact}\n`;
+  if(values.location) resume += `Location: ${values.location}\n`;
+  if(values.website) resume += `Website: ${values.website}\n\n`;
+
   resume += "Work Experience:\n";
   values.experiences.forEach(exp => {
     resume += `- ${exp.title} at ${exp.company} (${exp.dates})\n  ${exp.description.replace(/\n/g, '\n  ')}\n`;
@@ -89,7 +97,10 @@ export default function Home() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      professionalTitle: "",
       contact: "",
+      location: "",
+      website: "",
       experiences: [{ title: "", company: "", dates: "", description: "" }],
       educations: [{ degree: "", school: "", year: "" }],
       skills: "",
@@ -153,7 +164,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-16 backdrop-blur-sm">
       <div className="text-center max-w-3xl mx-auto animate-fade-in-up">
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground backdrop-blur-sm bg-black/10 rounded-md px-4 py-2 inline-block">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground bg-black/10 rounded-md px-4 py-2 inline-block">
           AI-Powered Resume Maker
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground" style={{ animationDelay: '0.2s' }}>
@@ -181,19 +192,34 @@ export default function Home() {
                   <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
                     <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
-                       <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Full Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="John Doe" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Full Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="John Doe" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="professionalTitle"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Professional Title</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Senior Software Engineer" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                       </div>
                         <FormField
                           control={form.control}
                           name="contact"
@@ -207,6 +233,34 @@ export default function Home() {
                             </FormItem>
                           )}
                         />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="location"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="font-semibold">Location</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="San Francisco, CA" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="website"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="font-semibold">Website/Portfolio</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="https://your-portfolio.com" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </div>
                         <FormItem>
                           <FormLabel className="font-semibold">Profile Photo</FormLabel>
                           <div className="flex items-center gap-4">
