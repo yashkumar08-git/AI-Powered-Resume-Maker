@@ -33,9 +33,9 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
-          <div className="relative flex flex-col min-h-screen bg-background/50">
+          <div className="relative flex flex-col min-h-screen bg-background/80">
             <Header />
-            <main className="flex-grow backdrop-blur-sm">{children}</main>
+            <main className="flex-grow">{children}</main>
             <Footer />
           </div>
           <Toaster />
