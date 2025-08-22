@@ -37,27 +37,25 @@ import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building } from "lucide-react";
 
 const experienceSchema = z.object({
-  title: z.string().min(1, "Title is required."),
-  company: z.string().min(1, "Company is required."),
-  dates: z.string().min(1, "Dates are required."),
-  description: z.string().min(1, "Description is required."),
+  title: z.string(),
+  company: z.string(),
+  dates: z.string(),
+  description: z.string(),
 });
 
 const educationSchema = z.object({
-  degree: z.string().min(1, "Degree is required."),
-  school: z.string().min(1, "School is required."),
-  year: z.string().min(1, "Year is required."),
+  degree: z.string(),
+  school: z.string(),
+  year: z.string(),
 });
 
 const formSchema = z.object({
-  name: z.string().min(2, "Name is required."),
-  contact: z.string().min(5, "Contact info is required."),
-  experiences: z.array(experienceSchema).min(1, "At least one work experience is required."),
-  educations: z.array(educationSchema).min(1, "At least one education entry is required."),
-  skills: z.string().min(3, "Skills are required."),
-  jobDescription: z
-    .string()
-    .min(50, "Job description must be at least 50 characters."),
+  name: z.string(),
+  contact: z.string(),
+  experiences: z.array(experienceSchema),
+  educations: z.array(educationSchema),
+  skills: z.string(),
+  jobDescription: z.string(),
 });
 
 type FormValues = z.infer<typeof formSchema>;

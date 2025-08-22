@@ -4,8 +4,8 @@ import { customizeResume, CustomizeResumeOutput } from "@/ai/flows/tailor-resume
 import { z } from "zod";
 
 const formSchema = z.object({
-  resume: z.string().min(1, "Resume cannot be empty."),
-  jobDescription: z.string().min(1, "Job description cannot be empty."),
+  resume: z.string(),
+  jobDescription: z.string(),
 });
 
 type ActionResponse = 
@@ -18,6 +18,10 @@ export async function handleCustomizeResumeAction(formData: { resume: string; jo
   if (!validation.success) {
     // A more detailed error could be formed from validation.error.issues
     return { success: false, error: "Invalid input." };
+  }
+  
+  if (!validation.data.resume.trim() && !validation.data.jobDescription.trim()) {
+    return { success: false, error: "Please provide either a resume or a job description." };
   }
 
   try {
