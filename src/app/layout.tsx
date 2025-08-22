@@ -28,11 +28,11 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          'min-h-screen bg-background font-body antialiased flex flex-col'
+          'min-h-screen bg-background font-body antialiased flex flex-col bg-image'
         )}
       >
         <AuthProvider>
-          <div className="relative flex flex-col min-h-screen">
+          <div className="relative flex flex-col min-h-screen backdrop-blur-sm bg-black/30">
             <Header />
             <main className="flex-grow">{children}</main>
             <Footer />
