@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview An AI agent that tailors a resume to a job description.
+ * @fileOverview An AI agent that tailors a resume and generates a cover letter.
  *
- * - tailorResume - A function that handles the resume tailoring process.
+ * - tailorResume - A function that handles the resume tailoring and cover letter generation.
  * - TailorResumeInput - The input type for the tailorResume function.
  * - TailorResumeOutput - The return type for the tailorResume function.
  */
@@ -33,13 +33,13 @@ const tailorResumePrompt = ai.definePrompt({
   name: 'tailorResumePrompt',
   input: {schema: TailorResumeInputSchema},
   output: {schema: TailorResumeOutputSchema},
-  prompt: `You are an expert resume writer. You will tailor the user's resume to the job description provided, highlighting relevant skills and experience. You will also write a cover letter for the job.
+  prompt: `You are an expert resume writer and career advisor. You will tailor the user's resume to the job description provided, highlighting relevant skills and experience. You will also write a compelling cover letter for the job.
 
 Resume:
-{{resume}}
+{{{resume}}}
 
 Job Description:
-{{jobDescription}}`,
+{{{jobDescription}}}`,
 });
 
 const tailorResumeFlow = ai.defineFlow(
