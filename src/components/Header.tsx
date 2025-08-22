@@ -10,7 +10,7 @@ export function Header() {
           <div className="p-2 bg-primary/10 group-hover:bg-primary/20 rounded-full transition-colors">
             <Wand2 className="h-6 w-6 text-primary" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">CareerCraft AI</span>
+          <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
         <div className="flex items-center gap-2">
           <Button variant="ghost">Login</Button>

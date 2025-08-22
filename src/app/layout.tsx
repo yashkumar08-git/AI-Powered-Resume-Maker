@@ -6,8 +6,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'CareerCraft AI',
-  description: 'Tailor your resume and generate a cover letter with AI.',
+  title: 'Resume Maker',
+  description: 'Create a professional resume and cover letter with AI.',
 };
 
 export default function RootLayout({

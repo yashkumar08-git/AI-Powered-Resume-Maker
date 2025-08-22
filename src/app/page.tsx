@@ -78,7 +78,7 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-center max-w-3xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
-          Craft Your Career Path
+          Create Your Perfect Resume
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground">
           Upload your resume, paste a job description, and let our AI craft a
