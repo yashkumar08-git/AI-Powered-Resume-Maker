@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -19,6 +20,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,7 +36,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingState } from "@/components/LoadingState";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building } from "lucide-react";
+import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 const experienceSchema = z.object({
   title: z.string(),
@@ -56,6 +59,7 @@ const formSchema = z.object({
   educations: z.array(educationSchema),
   skills: z.string(),
   jobDescription: z.string(),
+  photo: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -79,6 +83,7 @@ export default function Home() {
   const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -89,6 +94,7 @@ export default function Home() {
       educations: [{ degree: "", school: "", year: "" }],
       skills: "",
       jobDescription: "",
+      photo: "",
     },
   });
 
@@ -103,12 +109,29 @@ export default function Home() {
   });
 
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        form.setValue('photo', dataUri);
+        setPhotoPreview(dataUri);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
     setResult(null);
 
     const resume = assembleResume(values);
-    const response = await handleCustomizeResumeAction({resume: resume, jobDescription: values.jobDescription});
+    const response = await handleCustomizeResumeAction({
+      resume: resume, 
+      jobDescription: values.jobDescription,
+      photoDataUri: values.photo,
+    });
 
     setIsLoading(false);
     if (response.success && response.data) {
@@ -183,6 +206,26 @@ export default function Home() {
                           </FormItem>
                         )}
                       />
+                      <FormItem>
+                        <FormLabel className="font-semibold">Profile Photo</FormLabel>
+                        <div className="flex items-center gap-4">
+                            <FormControl>
+                                <Input type="file" accept="image/*" className="max-w-xs" onChange={handlePhotoChange} />
+                            </FormControl>
+                            {photoPreview && (
+                                <Image src={photoPreview} alt="Profile preview" width={80} height={80} className="rounded-full object-cover w-20 h-20" />
+                            )}
+                            {!photoPreview && (
+                                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                                    <ImageIcon className="text-muted-foreground" />
+                                </div>
+                            )}
+                        </div>
+                        <FormDescription>
+                          Optional: Upload a professional headshot.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-2">
@@ -342,3 +385,4 @@ export default function Home() {
     </div>
   );
 }
+

@@ -1,3 +1,4 @@
+
 "use server";
 
 import { customizeResume, CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
@@ -6,13 +7,14 @@ import { z } from "zod";
 const formSchema = z.object({
   resume: z.string(),
   jobDescription: z.string(),
+  photoDataUri: z.string().optional(),
 });
 
 type ActionResponse = 
   | { success: true; data: CustomizeResumeOutput }
   | { success: false; error: string };
 
-export async function handleCustomizeResumeAction(formData: { resume: string; jobDescription: string }): Promise<ActionResponse> {
+export async function handleCustomizeResumeAction(formData: { resume: string; jobDescription: string; photoDataUri?: string }): Promise<ActionResponse> {
   const validation = formSchema.safeParse(formData);
 
   if (!validation.success) {
@@ -28,6 +30,7 @@ export async function handleCustomizeResumeAction(formData: { resume: string; jo
     const result = await customizeResume({
       resume: validation.data.resume,
       jobDescription: validation.data.jobDescription,
+      photoDataUri: validation.data.photoDataUri,
     });
     return { success: true, data: result };
   } catch (e) {
@@ -36,3 +39,4 @@ export async function handleCustomizeResumeAction(formData: { resume: string; jo
     return { success: false, error: "Failed to generate documents. Please try again later." };
   }
 }
+

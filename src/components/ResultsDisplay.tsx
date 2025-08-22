@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef } from "react";
@@ -15,6 +16,7 @@ import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, Graduat
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import Image from "next/image";
 
 interface ResultsDisplayProps {
   result: CustomizeResumeOutput;
@@ -58,16 +60,21 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         const canvasHeight = canvas.height;
         const ratio = canvasWidth / canvasHeight;
         const width = pdfWidth;
-        const height = width / ratio;
+        let height = width / ratio;
+
+        if (height > pdfHeight) {
+          height = pdfHeight;
+        }
 
         let position = 0;
-        let heightLeft = height;
+        let heightLeft = canvas.height * (pdfWidth / canvas.width) ;
+
 
         pdf.addImage(imgData, 'PNG', 0, position, width, height);
         heightLeft -= pdfHeight;
 
         while (heightLeft > 0) {
-          position = heightLeft - height;
+          position = -pdfHeight;
           pdf.addPage();
           pdf.addImage(imgData, 'PNG', 0, position, width, height);
           heightLeft -= pdfHeight;
@@ -169,9 +176,14 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               <div className="p-8 bg-background h-[800px] overflow-y-auto">
                 <div ref={resumeRef} className="p-8 bg-white text-black shadow-lg rounded-lg max-w-4xl mx-auto font-sans">
                   {/* Header */}
-                  <div className="text-center border-b-2 border-gray-200 pb-4 mb-6">
-                    <h1 className="text-4xl font-bold text-gray-800">{customizedResume.name}</h1>
-                    <p className="text-md text-gray-600 mt-1">{customizedResume.contact}</p>
+                  <div className="flex items-center justify-between border-b-2 border-gray-200 pb-4 mb-6">
+                    <div className="flex-1">
+                      <h1 className="text-4xl font-bold text-gray-800">{customizedResume.name}</h1>
+                      <p className="text-md text-gray-600 mt-1">{customizedResume.contact}</p>
+                    </div>
+                    {customizedResume.photoDataUri && (
+                       <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={100} height={100} className="rounded-full object-cover w-24 h-24" />
+                    )}
                   </div>
                   
                   {/* Summary */}

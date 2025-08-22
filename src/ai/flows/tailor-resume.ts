@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -16,12 +17,14 @@ const CustomizeResumeInputSchema = z.object({
     .string()
     .describe('The resume of the user as plain text.'),
   jobDescription: z.string().describe('The job description to customize the resume to.'),
+  photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
 });
 export type CustomizeResumeInput = z.infer<typeof CustomizeResumeInputSchema>;
 
 const ResumeSchema = z.object({
   name: z.string().describe("The user's full name."),
   contact: z.string().describe("The user's contact information (email, phone, LinkedIn)."),
+  photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI."),
   summary: z.string().describe("A professional summary customized for the job."),
   experience: z.array(z.object({
     title: z.string().describe("Job title."),
@@ -53,6 +56,8 @@ const customizeResumePrompt = ai.definePrompt({
   output: {schema: CustomizeResumeOutputSchema},
   prompt: `You are an expert resume writer and career advisor. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. Structure the output as a JSON object that conforms to the provided schema. You will also write a compelling cover letter for the job.
 
+If a photo is provided, include the photo's data URI in the 'photoDataUri' field of the resume object. Otherwise, leave it null.
+
 Resume:
 {{{resume}}}
 
@@ -68,6 +73,10 @@ const customizeResumeFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await customizeResumePrompt(input);
+    if (output) {
+      // Ensure photoDataUri is passed through if it exists
+      output.customizedResume.photoDataUri = input.photoDataUri;
+    }
     return output!;
   }
 );
