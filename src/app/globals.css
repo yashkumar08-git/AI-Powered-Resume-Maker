@@ -4,9 +4,9 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 220 20% 98%;
     --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
+    --card: 220 15% 95%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
@@ -16,7 +16,7 @@
     --secondary-foreground: 220 8.9% 46.1%;
     --muted: 220 14.3% 95.9%;
     --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
+    --accent: 210 40% 90%;
     --accent-foreground: 220 8.9% 46.1%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -64,5 +64,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(circle at top right, hsl(var(--primary) / 0.1), transparent 40%),
+                      radial-gradient(circle at bottom left, hsl(var(--accent) / 0.1), transparent 50%);
+    background-attachment: fixed;
   }
 }
