@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
 
 interface ResultsDisplayProps {
   result: CustomizeResumeOutput;
@@ -19,6 +23,8 @@ interface ResultsDisplayProps {
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const { toast } = useToast();
+  const resumeRef = useRef<HTMLDivElement>(null);
+  const coverLetterRef = useRef<HTMLDivElement>(null);
 
   const downloadTextFile = (content: string, filename: string) => {
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -39,8 +45,46 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     });
   };
 
-  const DocumentActions = ({ content, filename }: { content: string, filename: string }) => (
-    <div className="flex items-center gap-2">
+  const downloadPdf = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
+    if (ref.current) {
+      const doc = new jsPDF();
+      // A4 dimensions in mm
+      const a4Width = 210;
+      const a4Height = 297;
+      const margin = 15;
+      const textWidth = a4Width - (margin * 2);
+
+      const text = ref.current.innerText;
+      
+      const splitText = doc.splitTextToSize(text, textWidth);
+
+      let y = margin;
+      splitText.forEach((line: string) => {
+          if (y > a4Height - margin) {
+              doc.addPage();
+              y = margin;
+          }
+          doc.text(line, margin, y);
+          y += 7; // Line height
+      });
+
+      doc.save(filename);
+    }
+  };
+
+  const downloadImage = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
+    if (ref.current) {
+      html2canvas(ref.current, { backgroundColor: '#ffffff' }).then((canvas) => {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  };
+
+  const DocumentActions = ({ content, filename, contentRef }: { content: string, filename: string, contentRef: React.RefObject<HTMLDivElement> }) => (
+    <div className="flex items-center gap-2 flex-wrap">
       <Button
         variant="outline"
         size="sm"
@@ -53,11 +97,27 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         variant="outline"
         size="sm"
         onClick={() =>
-          downloadTextFile(content, filename)
+          downloadTextFile(content, `${filename}.txt`)
         }
       >
         <Download className="mr-2 h-4 w-4" />
-        Download
+        TXT
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => downloadPdf(contentRef, `${filename}.pdf`)}
+      >
+        <FileType className="mr-2 h-4 w-4" />
+        PDF
+      </Button>
+       <Button
+        variant="outline"
+        size="sm"
+        onClick={() => downloadImage(contentRef, `${filename}.png`)}
+      >
+        <FileImage className="mr-2 h-4 w-4" />
+        Image
       </Button>
     </div>
   );
@@ -95,10 +155,10 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   Optimized for the job description.
                 </CardDescription>
               </div>
-              <DocumentActions content={result.customizedResume} filename="customized-resume.txt" />
+              <DocumentActions content={result.customizedResume} filename="customized-resume" contentRef={resumeRef} />
             </CardHeader>
             <CardContent className="p-0">
-              <div className="p-6 bg-background h-[600px] overflow-y-auto">
+              <div ref={resumeRef} className="p-6 bg-background h-[600px] overflow-y-auto">
                 <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
                   {result.customizedResume}
                 </pre>
@@ -115,10 +175,10 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   A compelling letter to introduce yourself.
                 </CardDescription>
               </div>
-               <DocumentActions content={result.coverLetter} filename="cover-letter.txt" />
+               <DocumentActions content={result.coverLetter} filename="cover-letter" contentRef={coverLetterRef} />
             </CardHeader>
             <CardContent className="p-0">
-              <div className="p-6 bg-background h-[600px] overflow-y-auto">
+              <div ref={coverLetterRef} className="p-6 bg-background h-[600px] overflow-y-auto">
                 <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
                   {result.coverLetter}
                 </pre>
