@@ -145,7 +145,6 @@ export default function Home() {
     setIsLoading(false);
     if (response.success && response.data) {
       setResult(response.data);
-      setBackgroundClass('bg-image-1');
       toast({
         title: "Success!",
         description: "Your customized documents have been generated.",
