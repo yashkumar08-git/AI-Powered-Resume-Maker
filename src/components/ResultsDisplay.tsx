@@ -11,11 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, UserCircle, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
 
 interface ResultsDisplayProps {
   result: CustomizeResumeOutput;
@@ -25,6 +24,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const { toast } = useToast();
   const resumeRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
+  const { customizedResume, coverLetter } = result;
 
   const downloadTextFile = (content: string, filename: string) => {
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -38,43 +38,49 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     URL.revokeObjectURL(url);
   };
   
-  const copyToClipboard = (content: string) => {
-    navigator.clipboard.writeText(content);
-    toast({
-        title: "Copied to clipboard!",
-    });
+  const copyToClipboard = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+        navigator.clipboard.writeText(ref.current.innerText);
+        toast({
+            title: "Copied to clipboard!",
+        });
+    }
   };
 
   const downloadPdf = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     if (ref.current) {
-      const doc = new jsPDF();
-      // A4 dimensions in mm
-      const a4Width = 210;
-      const a4Height = 297;
-      const margin = 15;
-      const textWidth = a4Width - (margin * 2);
+      html2canvas(ref.current, { scale: 2, backgroundColor: '#ffffff' }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const ratio = canvasWidth / canvasHeight;
+        const width = pdfWidth;
+        const height = width / ratio;
 
-      const text = ref.current.innerText;
-      
-      const splitText = doc.splitTextToSize(text, textWidth);
+        let position = 0;
+        let heightLeft = height;
 
-      let y = margin;
-      splitText.forEach((line: string) => {
-          if (y > a4Height - margin) {
-              doc.addPage();
-              y = margin;
-          }
-          doc.text(line, margin, y);
-          y += 7; // Line height
+        pdf.addImage(imgData, 'PNG', 0, position, width, height);
+        heightLeft -= pdfHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - height;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, width, height);
+          heightLeft -= pdfHeight;
+        }
+        
+        pdf.save(filename);
       });
-
-      doc.save(filename);
     }
   };
 
   const downloadImage = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     if (ref.current) {
-      html2canvas(ref.current, { backgroundColor: '#ffffff' }).then((canvas) => {
+      html2canvas(ref.current, { scale: 2, backgroundColor: '#ffffff' }).then((canvas) => {
         const link = document.createElement('a');
         link.download = filename;
         link.href = canvas.toDataURL('image/png');
@@ -83,12 +89,12 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     }
   };
 
-  const DocumentActions = ({ content, filename, contentRef }: { content: string, filename: string, contentRef: React.RefObject<HTMLDivElement> }) => (
+  const DocumentActions = ({ contentRef, filename }: { contentRef: React.RefObject<HTMLDivElement>, filename: string }) => (
     <div className="flex items-center gap-2 flex-wrap">
       <Button
         variant="outline"
         size="sm"
-        onClick={() => copyToClipboard(content)}
+        onClick={() => copyToClipboard(contentRef)}
       >
         <Copy className="mr-2 h-4 w-4" />
         Copy
@@ -96,9 +102,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       <Button
         variant="outline"
         size="sm"
-        onClick={() =>
-          downloadTextFile(content, `${filename}.txt`)
-        }
+        onClick={() => {
+            if (contentRef.current) {
+                downloadTextFile(contentRef.current.innerText, `${filename}.txt`)
+            }
+        }}
       >
         <Download className="mr-2 h-4 w-4" />
         TXT
@@ -155,13 +163,62 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   Optimized for the job description.
                 </CardDescription>
               </div>
-              <DocumentActions content={result.customizedResume} filename="customized-resume" contentRef={resumeRef} />
+              <DocumentActions filename="customized-resume" contentRef={resumeRef} />
             </CardHeader>
             <CardContent className="p-0">
-              <div ref={resumeRef} className="p-6 bg-background h-[600px] overflow-y-auto">
-                <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
-                  {result.customizedResume}
-                </pre>
+              <div className="p-8 bg-background h-[800px] overflow-y-auto">
+                <div ref={resumeRef} className="p-8 bg-white text-black shadow-lg rounded-lg max-w-4xl mx-auto font-sans">
+                  {/* Header */}
+                  <div className="text-center border-b-2 border-gray-200 pb-4 mb-6">
+                    <h1 className="text-4xl font-bold text-gray-800">{customizedResume.name}</h1>
+                    <p className="text-md text-gray-600 mt-1">{customizedResume.contact}</p>
+                  </div>
+                  
+                  {/* Summary */}
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2 mb-2 flex items-center gap-2"><UserCircle/> Professional Summary</h2>
+                    <p className="text-sm text-gray-700 leading-relaxed">{customizedResume.summary}</p>
+                  </div>
+
+                  {/* Work Experience */}
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2 mb-2 flex items-center gap-2"><Briefcase/> Work Experience</h2>
+                    {customizedResume.experience.map((exp, index) => (
+                      <div key={index} className="mb-4">
+                        <h3 className="text-lg font-semibold text-gray-800">{exp.title}</h3>
+                        <div className="flex justify-between items-baseline">
+                           <p className="text-md font-medium text-gray-700">{exp.company}</p>
+                           <p className="text-sm text-gray-500">{exp.dates}</p>
+                        </div>
+                        <p className="text-sm text-gray-700 mt-1 whitespace-pre-line leading-relaxed">{exp.description}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Education */}
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2 mb-2 flex items-center gap-2"><GraduationCap/> Education</h2>
+                    {customizedResume.education.map((edu, index) => (
+                      <div key={index} className="flex justify-between items-baseline">
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800">{edu.degree}</h3>
+                            <p className="text-md font-medium text-gray-700">{edu.school}</p>
+                        </div>
+                        <p className="text-sm text-gray-500">{edu.year}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Skills */}
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2 mb-2 flex items-center gap-2"><Star/> Skills</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {customizedResume.skills.map((skill, index) => (
+                        <span key={index} className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -175,12 +232,12 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   A compelling letter to introduce yourself.
                 </CardDescription>
               </div>
-               <DocumentActions content={result.coverLetter} filename="cover-letter" contentRef={coverLetterRef} />
+               <DocumentActions filename="cover-letter" contentRef={coverLetterRef} />
             </CardHeader>
             <CardContent className="p-0">
               <div ref={coverLetterRef} className="p-6 bg-background h-[600px] overflow-y-auto">
                 <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
-                  {result.coverLetter}
+                  {coverLetter}
                 </pre>
               </div>
             </CardContent>
