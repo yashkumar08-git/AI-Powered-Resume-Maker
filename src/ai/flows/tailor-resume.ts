@@ -66,7 +66,12 @@ Resume:
 {{{resume}}}
 
 Job Description:
-{{{jobDescription}}}`,
+{{{jobDescription}}}
+{{#if photoDataUri}}
+Photo:
+{{media url=photoDataUri}}
+{{/if}}
+`,
 });
 
 const customizeResumeFlow = ai.defineFlow(
