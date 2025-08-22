@@ -28,16 +28,12 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          'min-h-screen bg-background font-body antialiased flex flex-col',
-          'bg-image'
+          'min-h-screen bg-background font-body antialiased flex flex-col'
         )}
       >
         <AuthProvider>
           <Header />
-          <div className="relative flex-grow flex flex-col">
-             <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-0" />
-            <main className="flex-grow relative z-10 h-full">{children}</main>
-          </div>
+          <main className="flex-grow">{children}</main>
           <Footer />
           <Toaster />
         </AuthProvider>

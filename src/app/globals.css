@@ -65,11 +65,4 @@
   body {
     @apply bg-background text-foreground;
   }
-  
-  .bg-image {
-    background-image: url('https://storage.googleapis.com/aif-stg-build-test-project/e2e-files/projects/wB9I1S5k6P53b2yWxJ1a/X3Y4Z5A6B7C8D9E0_background.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-  }
 }
