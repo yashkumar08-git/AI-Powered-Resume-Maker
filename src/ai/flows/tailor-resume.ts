@@ -39,6 +39,7 @@ const ResumeSchema = z.object({
     degree: z.string().describe("Degree or certificate obtained."),
     school: z.string().describe("Name of the school or university."),
     year: z.string().describe("Year of graduation."),
+    percentage: z.string().optional().describe("Percentage or GPA obtained."),
   })).describe("The user's education history."),
   skills: z.array(z.string()).describe("A list of skills relevant to the job description."),
 });

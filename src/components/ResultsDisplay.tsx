@@ -224,10 +224,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   <div className="mb-6">
                     <h2 className="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2 mb-2 flex items-center gap-2"><GraduationCap/> Education</h2>
                     {customizedResume.education.map((edu, index) => (
-                      <div key={index} className="flex justify-between items-baseline">
+                      <div key={index} className="flex justify-between items-baseline mb-2">
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800">{edu.degree}</h3>
                             <p className="text-md font-medium text-gray-700">{edu.school}</p>
+                             {edu.percentage && <p className="text-sm text-gray-600">Percentage/GPA: {edu.percentage}</p>}
                         </div>
                         <p className="text-sm text-gray-500">{edu.year}</p>
                       </div>

@@ -50,6 +50,7 @@ const educationSchema = z.object({
   degree: z.string(),
   school: z.string(),
   year: z.string(),
+  percentage: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -80,7 +81,11 @@ function assembleResume(values: FormValues): string {
   });
   resume += "\nEducation:\n";
   values.educations.forEach(edu => {
-    resume += `- ${edu.degree}, ${edu.school} (${edu.year})\n`;
+    resume += `- ${edu.degree}, ${edu.school} (${edu.year})`;
+    if (edu.percentage) {
+      resume += ` - ${edu.percentage}`;
+    }
+    resume += '\n';
   });
   resume += `\nSkills:\n${values.skills}`;
   return resume;
@@ -102,7 +107,7 @@ export default function Home() {
       location: "",
       website: "",
       experiences: [{ title: "", company: "", dates: "", description: "" }],
-      educations: [{ degree: "", school: "", year: "" }],
+      educations: [{ degree: "", school: "", year: "", percentage: "" }],
       skills: "",
       jobDescription: "",
       photo: "",
@@ -365,21 +370,34 @@ export default function Home() {
                               </FormItem>
                             )}
                           />
-                           <FormField
-                            control={form.control}
-                            name={`educations.${index}.year`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="font-semibold">Year of Graduation</FormLabel>
-                                <FormControl><Input placeholder="2021" {...field} /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`educations.${index}.year`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="font-semibold">Year of Graduation</FormLabel>
+                                  <FormControl><Input placeholder="2021" {...field} /></FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`educations.${index}.percentage`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="font-semibold">Percentage/GPA</FormLabel>
+                                  <FormControl><Input placeholder="e.g. 85% or 3.8/4.0" {...field} /></FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                           </div>
                           {eduFields.length > 1 && <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => removeEdu(index)}><Trash2 className="text-destructive" /></Button>}
                          </div>
                       ))}
-                       <Button type="button" variant="outline" onClick={() => appendEdu({ degree: "", school: "", year: "" })}><PlusCircle className="mr-2" /> Add Education</Button>
+                       <Button type="button" variant="outline" onClick={() => appendEdu({ degree: "", school: "", year: "", percentage: "" })}><PlusCircle className="mr-2" /> Add Education</Button>
                     </AccordionContent>
                   </AccordionItem>
                    <AccordionItem value="item-4">
