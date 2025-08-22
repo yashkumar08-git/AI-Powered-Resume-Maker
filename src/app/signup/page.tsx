@@ -71,7 +71,7 @@ export default function SignUpPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 flex items-center justify-center min-h-[calc(100vh-200px)]">
-      <Card className="max-w-md w-full shadow-lg animate-fade-in-up">
+      <Card className="max-w-md w-full animate-fade-in-up">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserPlus />

@@ -162,7 +162,7 @@ export default function Home() {
         </p>
       </div>
 
-      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto shadow-2xl shadow-primary/10 border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+      <Card className="mt-8 md:mt-12 max-w-4xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl">
             <Wand2 className="text-primary"/>
@@ -385,4 +385,3 @@ export default function Home() {
     </div>
   );
 }
-

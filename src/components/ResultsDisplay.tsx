@@ -51,7 +51,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   const downloadPdf = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     if (ref.current) {
-      html2canvas(ref.current, { scale: 2, backgroundColor: '#ffffff' }).then((canvas) => {
+      html2canvas(ref.current, { scale: 2, backgroundColor: null }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -59,25 +59,31 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const ratio = canvasWidth / canvasHeight;
-        const width = pdfWidth;
+        let width = pdfWidth;
         let height = width / ratio;
 
         if (height > pdfHeight) {
           height = pdfHeight;
+          width = height * ratio;
         }
 
         let position = 0;
-        let heightLeft = canvas.height * (pdfWidth / canvas.width) ;
+        let pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = (canvas.width / pdfWidth) * pdfHeight;
+        let pageCtx = pageCanvas.getContext('2d');
+        let heightLeft = canvas.height;
 
-
-        pdf.addImage(imgData, 'PNG', 0, position, width, height);
-        heightLeft -= pdfHeight;
 
         while (heightLeft > 0) {
-          position = -pdfHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, width, height);
-          heightLeft -= pdfHeight;
+          pageCtx?.drawImage(canvas, 0, -position, canvas.width, canvas.height);
+          const pageImgData = pageCanvas.toDataURL('image/png');
+          if (position > 0) {
+            pdf.addPage();
+          }
+          pdf.addImage(pageImgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+          heightLeft -= pageCanvas.height;
+          position += pageCanvas.height;
         }
         
         pdf.save(filename);
@@ -87,7 +93,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   const downloadImage = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     if (ref.current) {
-      html2canvas(ref.current, { scale: 2, backgroundColor: '#ffffff' }).then((canvas) => {
+      html2canvas(ref.current, { scale: 2, backgroundColor: null }).then((canvas) => {
         const link = document.createElement('a');
         link.download = filename;
         link.href = canvas.toDataURL('image/png');
@@ -162,7 +168,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </TabsList>
         </div>
         <TabsContent value="resume">
-          <Card className="shadow-none">
+          <Card className="shadow-none bg-white/5">
             <CardHeader className="flex flex-row items-center justify-between border-b">
               <div>
                 <CardTitle>Customized Resume</CardTitle>
@@ -173,7 +179,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               <DocumentActions filename="customized-resume" contentRef={resumeRef} />
             </CardHeader>
             <CardContent className="p-0">
-              <div className="p-8 bg-background h-[800px] overflow-y-auto">
+              <div className="p-8 bg-transparent h-[800px] overflow-y-auto">
                 <div ref={resumeRef} className="p-8 bg-white text-black shadow-lg rounded-lg max-w-4xl mx-auto font-sans">
                   {/* Header */}
                   <div className="flex items-center justify-between border-b-2 border-gray-200 pb-4 mb-6">
@@ -236,7 +242,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </Card>
         </TabsContent>
         <TabsContent value="cover-letter">
-          <Card className="shadow-none">
+          <Card className="shadow-none bg-white/5">
             <CardHeader className="flex flex-row items-center justify-between border-b">
               <div>
                 <CardTitle>Cover Letter</CardTitle>
@@ -247,8 +253,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                <DocumentActions filename="cover-letter" contentRef={coverLetterRef} />
             </CardHeader>
             <CardContent className="p-0">
-              <div ref={coverLetterRef} className="p-6 bg-background h-[600px] overflow-y-auto">
-                <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
+              <div ref={coverLetterRef} className="p-8 bg-white text-black shadow-lg rounded-lg max-w-4xl mx-auto font-sans h-[600px] overflow-y-auto">
+                <pre className="text-sm whitespace-pre-wrap font-sans text-black leading-relaxed">
                   {coverLetter}
                 </pre>
               </div>
