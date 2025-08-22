@@ -28,7 +28,8 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          'min-h-screen bg-background font-body antialiased flex flex-col'
+          'min-h-screen bg-background font-body antialiased flex flex-col',
+          "before:content-[''] before:fixed before:inset-0 before:bg-black/10 before:backdrop-blur-sm"
         )}
       >
         <AuthProvider>
