@@ -84,15 +84,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [backgroundClass, setBackgroundClass] = useState('bg-image');
-
-  useEffect(() => {
-    const body = document.getElementById('main-body');
-    if (body) {
-      body.className = body.className.replace(/bg-image-?\w*/g, '');
-      body.classList.add(backgroundClass);
-    }
-  }, [backgroundClass]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -393,7 +384,7 @@ export default function Home() {
 
 
       {isLoading && <LoadingState />}
-      {result && <ResultsDisplay result={result} setBackgroundClass={setBackgroundClass} />}
+      {result && <ResultsDisplay result={result} />}
     </div>
   );
 }
