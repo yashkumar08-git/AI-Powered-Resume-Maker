@@ -179,7 +179,7 @@ export default function Home() {
                <Accordion type="multiple" defaultValue={['item-1', 'item-5']} className="w-full">
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
-                  <AccordionContent className="space-y-4 p-4 bg-secondary/30 rounded-md">
+                  <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
                      <FormField
                         control={form.control}
                         name="name"
@@ -232,7 +232,7 @@ export default function Home() {
                   <AccordionTrigger className="text-xl font-semibold"><Building className="text-primary mr-3" /> Work Experience</AccordionTrigger>
                   <AccordionContent className="space-y-6 p-2">
                     {expFields.map((field, index) => (
-                      <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-secondary/30">
+                      <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-accent/30">
                          <FormField
                           control={form.control}
                           name={`experiences.${index}.title`}
@@ -287,7 +287,7 @@ export default function Home() {
                   <AccordionTrigger className="text-xl font-semibold"><GraduationCap className="text-primary mr-3" /> Education</AccordionTrigger>
                   <AccordionContent className="space-y-6 p-2">
                     {eduFields.map((field, index) => (
-                       <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-secondary/30">
+                       <div key={field.id} className="p-4 border rounded-md relative space-y-3 bg-accent/30">
                          <FormField
                           control={form.control}
                           name={`educations.${index}.degree`}
@@ -329,7 +329,7 @@ export default function Home() {
                 </AccordionItem>
                  <AccordionItem value="item-4">
                   <AccordionTrigger className="text-xl font-semibold"><Star className="text-primary mr-3" /> Skills</AccordionTrigger>
-                  <AccordionContent className="p-4 bg-secondary/30 rounded-md">
+                  <AccordionContent className="p-4 bg-accent/30 rounded-md">
                      <FormField
                       control={form.control}
                       name="skills"
@@ -351,7 +351,7 @@ export default function Home() {
                 </AccordionItem>
                  <AccordionItem value="item-5">
                   <AccordionTrigger className="text-xl font-semibold"><Briefcase className="text-primary mr-3" /> Job Description</AccordionTrigger>
-                  <AccordionContent className="p-4 bg-secondary/30 rounded-md">
+                  <AccordionContent className="p-4 bg-accent/30 rounded-md">
                      <FormField
                       control={form.control}
                       name="jobDescription"
