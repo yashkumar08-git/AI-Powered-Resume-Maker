@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { handleTailorResumeAction } from "@/app/actions";
+import { handleCustomizeResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import type { TailorResumeOutput } from "@/ai/flows/tailor-resume";
+import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -78,7 +78,7 @@ function assembleResume(values: FormValues): string {
 
 
 export default function Home() {
-  const [result, setResult] = useState<TailorResumeOutput | null>(null);
+  const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -110,14 +110,14 @@ export default function Home() {
     setResult(null);
 
     const resume = assembleResume(values);
-    const response = await handleTailorResumeAction({resume: resume, jobDescription: values.jobDescription});
+    const response = await handleCustomizeResumeAction({resume: resume, jobDescription: values.jobDescription});
 
     setIsLoading(false);
     if (response.success && response.data) {
       setResult(response.data);
       toast({
         title: "Success!",
-        description: "Your tailored documents have been generated.",
+        description: "Your customized documents have been generated.",
       });
     } else {
       toast({
@@ -137,7 +137,7 @@ export default function Home() {
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground" style={{ animationDelay: '0.2s' }}>
           Fill in your details, paste a job description, and let our AI craft a
-          perfectly tailored resume and cover letter for you.
+          perfectly customized resume and cover letter for you.
         </p>
       </div>
 
@@ -148,7 +148,7 @@ export default function Home() {
             Let's Get Started
           </CardTitle>
           <CardDescription>
-            Provide your details and the job description to begin the tailoring
+            Provide your details and the job description to begin the customization
             process.
           </CardDescription>
         </CardHeader>

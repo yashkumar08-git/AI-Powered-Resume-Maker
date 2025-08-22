@@ -1,6 +1,6 @@
 "use client";
 
-import type { TailorResumeOutput } from "@/ai/flows/tailor-resume";
+import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +14,7 @@ import { Download, FileText, Mail, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ResultsDisplayProps {
-  result: TailorResumeOutput;
+  result: CustomizeResumeOutput;
 }
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
@@ -68,7 +68,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <div className="flex-1">
              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                Your Tailored Documents
+                Your Customized Documents
             </h2>
             <p className="text-muted-foreground mt-1">
                 Your resume and cover letter are ready.
@@ -78,7 +78,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           <TabsList className="grid w-full max-w-sm grid-cols-2">
             <TabsTrigger value="resume">
               <FileText className="mr-2 h-4 w-4" />
-              Tailored Resume
+              Customized Resume
             </TabsTrigger>
             <TabsTrigger value="cover-letter">
               <Mail className="mr-2 h-4 w-4" />
@@ -90,17 +90,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           <Card className="shadow-none">
             <CardHeader className="flex flex-row items-center justify-between border-b">
               <div>
-                <CardTitle>Tailored Resume</CardTitle>
+                <CardTitle>Customized Resume</CardTitle>
                 <CardDescription>
                   Optimized for the job description.
                 </CardDescription>
               </div>
-              <DocumentActions content={result.tailoredResume} filename="tailored-resume.txt" />
+              <DocumentActions content={result.customizedResume} filename="customized-resume.txt" />
             </CardHeader>
             <CardContent className="p-0">
               <div className="p-6 bg-background h-[600px] overflow-y-auto">
                 <pre className="text-sm whitespace-pre-wrap font-sans text-foreground leading-relaxed">
-                  {result.tailoredResume}
+                  {result.customizedResume}
                 </pre>
               </div>
             </CardContent>

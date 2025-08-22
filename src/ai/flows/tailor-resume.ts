@@ -1,39 +1,39 @@
 'use server';
 
 /**
- * @fileOverview An AI agent that tailors a resume and generates a cover letter.
+ * @fileOverview An AI agent that customizes a resume and generates a cover letter.
  *
- * - tailorResume - A function that handles the resume tailoring and cover letter generation.
- * - TailorResumeInput - The input type for the tailorResume function.
- * - TailorResumeOutput - The return type for the tailorResume function.
+ * - customizeResume - A function that handles the resume customization and cover letter generation.
+ * - CustomizeResumeInput - The input type for the customizeResume function.
+ * - CustomizeResumeOutput - The return type for the customizeResume function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const TailorResumeInputSchema = z.object({
+const CustomizeResumeInputSchema = z.object({
   resume: z
     .string()
     .describe('The resume of the user as plain text.'),
-  jobDescription: z.string().describe('The job description to tailor the resume to.'),
+  jobDescription: z.string().describe('The job description to customize the resume to.'),
 });
-export type TailorResumeInput = z.infer<typeof TailorResumeInputSchema>;
+export type CustomizeResumeInput = z.infer<typeof CustomizeResumeInputSchema>;
 
-const TailorResumeOutputSchema = z.object({
-  tailoredResume: z.string().describe('The tailored resume.'),
+const CustomizeResumeOutputSchema = z.object({
+  customizedResume: z.string().describe('The customized resume.'),
   coverLetter: z.string().describe('A cover letter for the job.'),
 });
-export type TailorResumeOutput = z.infer<typeof TailorResumeOutputSchema>;
+export type CustomizeResumeOutput = z.infer<typeof CustomizeResumeOutputSchema>;
 
-export async function tailorResume(input: TailorResumeInput): Promise<TailorResumeOutput> {
-  return tailorResumeFlow(input);
+export async function customizeResume(input: CustomizeResumeInput): Promise<CustomizeResumeOutput> {
+  return customizeResumeFlow(input);
 }
 
-const tailorResumePrompt = ai.definePrompt({
-  name: 'tailorResumePrompt',
-  input: {schema: TailorResumeInputSchema},
-  output: {schema: TailorResumeOutputSchema},
-  prompt: `You are an expert resume writer and career advisor. You will tailor the user's resume to the job description provided, highlighting relevant skills and experience. You will also write a compelling cover letter for the job.
+const customizeResumePrompt = ai.definePrompt({
+  name: 'customizeResumePrompt',
+  input: {schema: CustomizeResumeInputSchema},
+  output: {schema: CustomizeResumeOutputSchema},
+  prompt: `You are an expert resume writer and career advisor. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. You will also write a compelling cover letter for the job.
 
 Resume:
 {{{resume}}}
@@ -42,14 +42,14 @@ Job Description:
 {{{jobDescription}}}`,
 });
 
-const tailorResumeFlow = ai.defineFlow(
+const customizeResumeFlow = ai.defineFlow(
   {
-    name: 'tailorResumeFlow',
-    inputSchema: TailorResumeInputSchema,
-    outputSchema: TailorResumeOutputSchema,
+    name: 'customizeResumeFlow',
+    inputSchema: CustomizeResumeInputSchema,
+    outputSchema: CustomizeResumeOutputSchema,
   },
   async input => {
-    const {output} = await tailorResumePrompt(input);
+    const {output} = await customizeResumePrompt(input);
     return output!;
   }
 );
