@@ -177,7 +177,7 @@ export default function Home() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-                 <Accordion type="multiple" defaultValue={['item-1', 'item-5']} className="w-full">
+                 <Accordion type="multiple" defaultValue={['item-1', 'item-2', 'item-3', 'item-4', 'item-5']} className="w-full">
                   <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
                     <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
