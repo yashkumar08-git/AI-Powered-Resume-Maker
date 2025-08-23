@@ -89,31 +89,36 @@ export default function ProfilePage() {
         <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-4"
+            className="mb-4 animate-fade-in-up"
         >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
         </Button>
-      <Card className="w-full">
+      <Card className="w-full animate-fade-in-up shadow-lg">
         <CardHeader className="items-center text-center">
-            <Avatar className="h-24 w-24 mb-4">
-                <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
+            <Avatar className="h-24 w-24 mb-4 border-2 border-primary/50">
+                <AvatarFallback className="text-3xl">{getInitials(user.email)}</AvatarFallback>
             </Avatar>
             <CardTitle className="text-2xl">{user.displayName || user.email}</CardTitle>
             <CardDescription>{user.email}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 mt-4">
-            <h3 className="text-lg font-semibold px-2">Saved Resumes</h3>
+            <h3 className="text-lg font-semibold px-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>Saved Resumes</h3>
              {loadingResumes ? (
               <div className="space-y-4">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
               </div>
             ) : resumes.length > 0 ? (
               <div className="border rounded-lg p-2 space-y-2">
-                {resumes.map((resume) => (
-                  <div key={resume.id} className="flex items-center justify-between p-3 hover:bg-accent rounded-md transition-colors">
+                {resumes.map((resume, index) => (
+                  <div 
+                    key={resume.id} 
+                    className="flex items-center justify-between p-3 rounded-md transition-all duration-300 ease-in-out hover:bg-accent hover:shadow-md hover:scale-[1.02] cursor-pointer animate-fade-in-up"
+                    style={{ animationDelay: `${0.3 + index * 0.1}s` }}
+                    onClick={() => handleViewResume(resume)}
+                    >
                     <div className="flex items-center gap-4">
                        <FileText className="text-primary h-6 w-6" />
                        <div>
@@ -124,17 +129,17 @@ export default function ProfilePage() {
                        </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEditResume(resume)}>
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleEditResume(resume); }}>
                         <Pencil className="mr-2 h-3 w-3" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleViewResume(resume)}>View</Button>
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewResume(resume); }}>View</Button>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-                <div className="border rounded-lg p-4 text-center">
+                <div className="border rounded-lg p-4 text-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                     <p className="text-muted-foreground">No saved resumes yet.</p>
                     <Button variant="link" onClick={() => router.push('/')}>Create a new resume</Button>
                 </div>
