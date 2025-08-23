@@ -110,6 +110,7 @@ const customizeResumeFlow = ai.defineFlow(
     ]);
     
     const customizedResume = resumeResult.output!;
+    // Ensure photo is passed through if the model misses it.
     if (input.photoDataUri && !customizedResume.photoDataUri) {
       customizedResume.photoDataUri = input.photoDataUri;
     }
