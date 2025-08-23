@@ -24,10 +24,6 @@ export async function handleCustomizeResumeAction(
     return { success: false, error: "Invalid input." };
   }
   
-  if (!validation.data.resume.trim() && !validation.data.jobDescription.trim()) {
-    return { success: false, error: "Please provide either a resume or a job description." };
-  }
-
   try {
     const result = await customizeResume({
       resume: validation.data.resume,

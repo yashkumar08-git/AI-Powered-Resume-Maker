@@ -29,7 +29,7 @@ const ResumeSchema = z.object({
   email: z.string().optional().describe("The user's email address."),
   phone: z.string().optional().describe("The user's phone number."),
   linkedin: z.string().optional().describe("A link to the user's LinkedIn profile."),
-  photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI."),
+  photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI. If a photo was provided in the input, this should be included in the output."),
   summary: z.string().describe("A professional summary customized for the job."),
   experience: z.array(z.object({
     title: z.string().describe("Job title."),
@@ -62,7 +62,7 @@ const resumeOnlyPrompt = ai.definePrompt({
     output: {schema: ResumeSchema},
     prompt: `You are an expert resume writer. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. Structure the output as a JSON object that conforms to the provided schema.
 
-If a photo is provided, include the photo's data URI in the 'photoDataUri' field of the resume object.
+If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object.
 
 Resume:
 {{{resume}}}
@@ -108,14 +108,9 @@ const customizeResumeFlow = ai.defineFlow(
         jobDescription: input.jobDescription,
       }),
     ]);
-
-    const customizedResume = resumeResult.output!;
-    if (input.photoDataUri) {
-        customizedResume.photoDataUri = input.photoDataUri;
-    }
-
+    
     return {
-      customizedResume,
+      customizedResume: resumeResult.output!,
       coverLetter: coverLetterResult.output!,
     };
   }
