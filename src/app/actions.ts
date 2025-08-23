@@ -25,7 +25,12 @@ export async function handleCustomizeResumeAction(
   }
   
   try {
-    const result = await customizeResume(validation.data);
+    // Correctly pass the validated data in the expected structure.
+    const result = await customizeResume({
+      resume: validation.data.resume,
+      jobDescription: validation.data.jobDescription,
+      photoDataUri: validation.data.photoDataUri,
+    });
     
     return { success: true, data: result };
   } catch (e: any) {
