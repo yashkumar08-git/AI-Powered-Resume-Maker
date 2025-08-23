@@ -45,7 +45,8 @@ export async function handleTailorResumeAction(
 
 export async function saveResumeAction(
   resumeData: TailorResumeOutput,
-  userId: string
+  userId: string,
+  resumeName: string,
 ): Promise<{ success: boolean, error?: string, id?: string }> {
   if (!userId) {
     return { success: false, error: "User must be logged in to save." };
@@ -54,6 +55,8 @@ export async function saveResumeAction(
   try {
     const docRef = await addDoc(collection(db, "resumes"), {
       userId,
+      resumeName, // Save the custom name
+      professionalTitle: resumeData.customizedResume.professionalTitle, // Save title for fallback
       ...resumeData,
       createdAt: serverTimestamp(),
     });
@@ -66,7 +69,7 @@ export async function saveResumeAction(
 
 export async function getSavedResumesAction(
   userId: string
-): Promise<{ success: boolean; data?: (TailorResumeOutput & { id: string, createdAt: any })[]; error?: string }> {
+): Promise<{ success: boolean; data?: (TailorResumeOutput & { id: string, createdAt: any, resumeName?: string, professionalTitle?: string })[]; error?: string }> {
   if (!userId) {
     return { success: false, error: "User not found." };
   }
@@ -76,7 +79,7 @@ export async function getSavedResumesAction(
     const resumes = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-    })) as (TailorResumeOutput & { id: string, createdAt: any })[];
+    })) as (TailorResumeOutput & { id: string, createdAt: any, resumeName?: string, professionalTitle?: string })[];
 
     return { success: true, data: resumes };
   } catch (error: any) {

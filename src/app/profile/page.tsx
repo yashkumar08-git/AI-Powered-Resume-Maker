@@ -12,14 +12,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader, FileText } from "lucide-react";
+import { Loader, FileText, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSavedResumesAction } from "@/app/actions";
 import { TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 
-type SavedResume = TailorResumeOutput & { id: string, createdAt: { seconds: number, nanoseconds: number } };
+type SavedResume = TailorResumeOutput & { id: string, createdAt: { seconds: number, nanoseconds: number }, resumeName?: string, professionalTitle?: string };
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -80,8 +80,16 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex justify-center items-start min-h-full py-12 px-4">
-      <Card className="w-full max-w-2xl">
+    <div className="container mx-auto max-w-2xl py-12 px-4">
+        <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="mb-4"
+        >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+        </Button>
+      <Card className="w-full">
         <CardHeader className="items-center text-center">
             <Avatar className="h-24 w-24 mb-4">
                 <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
@@ -104,7 +112,7 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-4">
                        <FileText className="text-primary h-6 w-6" />
                        <div>
-                          <p className="font-semibold">{resume.customizedResume.professionalTitle || 'Resume'}</p>
+                          <p className="font-semibold">{resume.resumeName || resume.professionalTitle || 'Resume'}</p>
                           <p className="text-sm text-muted-foreground">
                             Created {resume.createdAt ? formatDistanceToNow(new Date(resume.createdAt.seconds * 1000), { addSuffix: true }) : 'recently'}
                           </p>

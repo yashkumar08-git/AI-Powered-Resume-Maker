@@ -11,6 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2, Save, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +53,8 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [resumeName, setResumeName] = useState("");
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
 
   const downloadTextFile = (content: string, filename: string) => {
@@ -138,7 +152,7 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
     }
   };
 
-  const handleSaveResume = async () => {
+  const handleConfirmSave = async () => {
     if (!user) {
       toast({
         variant: "destructive",
@@ -147,9 +161,21 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
       });
       return;
     }
+    if (!resumeName.trim()) {
+        toast({
+            variant: "destructive",
+            title: "Name Required",
+            description: "Please enter a name for your resume.",
+        });
+        return;
+    }
+
     setIsSaving(true);
-    const response = await saveResumeAction(result, user.uid);
+    const response = await saveResumeAction(result, user.uid, resumeName);
     setIsSaving(false);
+    setIsSaveDialogOpen(false);
+    setResumeName("");
+
     if (response.success) {
       toast({
         title: "Resume Saved!",
@@ -225,14 +251,46 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                 Create New
             </Button>
             {user && (
-              <Button onClick={handleSaveResume} disabled={isSaving}>
-                {isSaving ? (
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Save
-              </Button>
+              <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Save Resume</DialogTitle>
+                    <DialogDescription>
+                      Give your resume a name to easily identify it later.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Name
+                      </Label>
+                      <Input
+                        id="name"
+                        value={resumeName}
+                        onChange={(e) => setResumeName(e.target.value)}
+                        className="col-span-3"
+                        placeholder="e.g., Google SWE Application"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" onClick={handleConfirmSave} disabled={isSaving}>
+                       {isSaving ? (
+                          <Loader className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="mr-2 h-4 w-4" />
+                        )}
+                      Confirm Save
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             )}
             <TemplateSwitcher
                 activeTemplate={activeTemplate}
