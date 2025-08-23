@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Wand2, LogOut, User as UserIcon, LayoutGrid } from 'lucide-react';
+import { Wand2, LogOut, User as UserIcon, LayoutGrid, Loader } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,10 +13,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/context/AuthContext';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 
 export function Header() {
-  const isLoggedIn = false; // Placeholder for authentication state
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push('/');
+  }
+
+  const getInitials = (email: string | null | undefined) => {
+    if (!email) return 'AD';
+    return email.substring(0, 2).toUpperCase();
+  }
   
   return (
     <header className="py-4 px-4 sm:px-6 lg:px-8 border-b animate-fade-in-down sticky top-0 z-40 bg-background/80 backdrop-blur-md">
@@ -28,22 +43,24 @@ export function Header() {
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
         <div className="flex items-center gap-2">
-            {isLoggedIn ? (
+            {loading ? (
+              <Loader className="animate-spin"/>
+            ) : user ? (
                <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                      <Avatar className="h-10 w-10">
-                      <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="user avatar" />
-                      <AvatarFallback>AD</AvatarFallback>
+                      <AvatarImage src={user.photoURL || `https://placehold.co/100x100.png`} alt="User avatar" data-ai-hint="user avatar" />
+                      <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">Alex Doe</p>
+                      <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        alex.doe@example.com
+                        {user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -59,7 +76,7 @@ export function Header() {
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
                      <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
                   </DropdownMenuItem>
