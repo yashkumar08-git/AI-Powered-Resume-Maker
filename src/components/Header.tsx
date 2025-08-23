@@ -1,8 +1,9 @@
 
 "use client";
 
-import { Wand2 } from 'lucide-react';
+import { Wand2, LogIn, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export function Header() {
   
@@ -15,9 +16,21 @@ export function Header() {
           </div>
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
+        <div className="flex items-center gap-2">
+            <Button asChild variant="ghost">
+                <Link href="/login">
+                    <LogIn />
+                    Sign In
+                </Link>
+            </Button>
+            <Button asChild>
+                <Link href="/signup">
+                    <UserPlus />
+                    Sign Up
+                </Link>
+            </Button>
+        </div>
       </div>
     </header>
   );
 }
-
-    
