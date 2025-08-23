@@ -60,7 +60,13 @@ const resumeOnlyPrompt = ai.definePrompt({
     name: 'resumeOnlyPrompt',
     input: {schema: CustomizeResumeInputSchema},
     output: {schema: ResumeSchema},
-    prompt: `You are an expert resume writer. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. Structure the output as a JSON object that conforms to the provided schema.
+    prompt: `You are an expert resume writer. Your task is to generate a resume based on the provided information.
+
+If the user provides a resume and/or a job description, you will customize the resume to the job description, highlighting relevant skills and experience.
+
+If the user provides an empty resume and an empty job description, you MUST generate a high-quality, complete sample resume for a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
+
+Structure the output as a JSON object that conforms to the provided schema.
 
 If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object.
 
@@ -83,7 +89,11 @@ const coverLetterOnlyPrompt = ai.definePrompt({
       jobDescription: z.string(),
     })},
     output: {schema: z.string()},
-    prompt: `You are an expert career advisor. Based on the provided resume and job description, write a compelling and professional cover letter.
+    prompt: `You are an expert career advisor. Your task is to write a compelling and professional cover letter based on the provided information.
+
+If the user provides a resume and/or a job description, you will write a cover letter tailored to that information.
+
+If the user provides an empty resume and an empty job description, you MUST generate a high-quality sample cover letter from a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
 
 Resume:
 {{{resume}}}

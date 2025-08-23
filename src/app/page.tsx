@@ -156,16 +156,7 @@ export default function Home() {
     setResult(null);
 
     const resume = assembleResume(values);
-    if (!resume.trim() && !values.jobDescription?.trim()) {
-       toast({
-        variant: "destructive",
-        title: "Incomplete Information",
-        description: "Please fill out at least one section of your resume or provide a job description.",
-      });
-      setIsLoading(false);
-      return;
-    }
-
+    
     const response = await handleCustomizeResumeAction(
       {
         resume: resume, 
@@ -218,8 +209,7 @@ export default function Home() {
           AI-Powered Resume Maker
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          Fill in your details, paste a job description, and let our AI craft a
-          perfectly customized resume and cover letter for you.
+          Fill in your details, paste a job description, or leave everything blank to generate a sample.
         </p>
       </div>
 
