@@ -57,11 +57,12 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   useEffect(() => {
-    // Pre-fill save dialog with existing name if editing
     // @ts-ignore
     if (result.resumeName) {
       // @ts-ignore
-      setResumeName(result.resumeName);
+      setResumeName(result.resumeName || (result.customizedResume?.professionalTitle || ''));
+    } else {
+      setResumeName(result.customizedResume?.professionalTitle || 'Untitled Resume');
     }
   }, [result]);
 
@@ -184,7 +185,10 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
 
     if (response.success) {
       setIsSaveDialogOpen(false);
-      // Don't clear resumeName if we want it to persist for next save
+      // Update the result with the new ID so the name persists if saved again
+      if (response.id) {
+        result.id = response.id;
+      }
       toast({
         title: "Resume Saved!",
         description: "Your resume has been successfully saved to your profile.",
@@ -288,9 +292,7 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                     </div>
                   </div>
                   <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                    </DialogClose>
+                    <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)}>Cancel</Button>
                     <Button type="button" onClick={handleConfirmSave} disabled={isSaving}>
                        {isSaving ? (
                           <Loader className="mr-2 h-4 w-4 animate-spin" />
@@ -426,3 +428,5 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
       </Tabs>
     </div>
   );
+
+    
