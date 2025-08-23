@@ -268,7 +268,7 @@ export default function Home() {
                         </div>
                         <FormItem>
                           <FormLabel className="font-semibold">Profile Photo</FormLabel>
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                               <FormControl>
                                   <Input type="file" accept="image/*" className="max-w-xs" onChange={handlePhotoChange} />
                               </FormControl>
@@ -276,7 +276,7 @@ export default function Home() {
                                   <Image src={photoPreview} alt="Profile preview" width={80} height={80} className="rounded-full object-cover w-20 h-20" />
                               )}
                               {!photoPreview && (
-                                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center shrink-0">
                                       <ImageIcon className="text-muted-foreground" />
                                   </div>
                               )}

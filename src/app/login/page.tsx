@@ -73,7 +73,7 @@ export default function LoginPage() {
     <div className="container mx-auto px-4 py-8 md:py-12 flex items-center justify-center min-h-[calc(100vh-200px)]">
       <Card className="max-w-md w-full animate-fade-in-up shadow-2xl shadow-primary/10 bg-gradient-to-br from-card to-background/50 transition-all duration-300 hover:shadow-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-2xl">
             <LogIn />
             Login
           </CardTitle>
