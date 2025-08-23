@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { handleCustomizeResumeAction } from "@/app/actions";
+import { handleTailorResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader } from "lucide-react";
 import Image from "next/image";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
+import type { TailorResumeOutput } from "@/ai/flows/tailor-resume";
 
 const experienceSchema = z.object({
   title: z.string(),
@@ -106,7 +106,7 @@ function assembleResume(values: FormValues): string {
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
+  const [result, setResult] = useState<TailorResumeOutput | null>(null);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -158,7 +158,7 @@ export default function Home() {
 
     const resumeText = assembleResume(values);
     
-    const response = await handleCustomizeResumeAction(
+    const response = await handleTailorResumeAction(
       {
         resume: resumeText, 
         jobDescription: values.jobDescription || "",

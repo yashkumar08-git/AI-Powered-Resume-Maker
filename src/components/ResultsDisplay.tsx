@@ -2,7 +2,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
+import type { TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 
 
 interface ResultsDisplayProps {
-  result: CustomizeResumeOutput;
+  result: TailorResumeOutput;
   onStartOver: () => void;
 }
 
@@ -318,5 +318,3 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
     </div>
   );
 }
-
-    

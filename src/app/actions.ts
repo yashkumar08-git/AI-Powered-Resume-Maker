@@ -1,7 +1,7 @@
 
 "use server";
 
-import { customizeResume, CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
+import { tailorResume, TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -11,10 +11,10 @@ const formSchema = z.object({
 });
 
 type ActionResponse = 
-  | { success: true, data: CustomizeResumeOutput }
+  | { success: true, data: TailorResumeOutput }
   | { success: false, error: string };
 
-export async function handleCustomizeResumeAction(
+export async function handleTailorResumeAction(
   formData: { resume: string; jobDescription?: string; photoDataUri?: string },
 ): Promise<ActionResponse> {
   const validation = formSchema.safeParse(formData);
@@ -25,7 +25,7 @@ export async function handleCustomizeResumeAction(
   }
   
   try {
-    const result = await customizeResume({
+    const result = await tailorResume({
       resume: validation.data.resume,
       jobDescription: validation.data.jobDescription,
       photoDataUri: validation.data.photoDataUri,
