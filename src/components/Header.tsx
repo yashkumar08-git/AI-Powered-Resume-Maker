@@ -30,6 +30,14 @@ export function Header() {
 
   const getInitials = (email: string | null | undefined) => {
     if (!email) return 'AD';
+    const name = user?.displayName;
+    if (name) {
+      const names = name.split(' ');
+      if (names.length > 1) {
+        return `${names[0][0]}${names[1][0]}`.toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
     return email.substring(0, 2).toUpperCase();
   }
   
@@ -40,7 +48,7 @@ export function Header() {
           <div className="p-2 bg-primary/10 group-hover:bg-primary/20 rounded-full transition-all duration-300 transform group-hover:scale-110">
             <Wand2 className="h-6 w-6 text-primary transition-transform duration-300 group-hover:rotate-12" />
           </div>
-          <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
+          <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">CareerCraft AI</span>
         </Link>
         <div className="flex items-center gap-2">
             {loading ? (
@@ -58,7 +66,7 @@ export function Header() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                      <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {user.email}
                       </p>

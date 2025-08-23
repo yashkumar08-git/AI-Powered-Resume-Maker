@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'Resume Maker',
+  title: 'CareerCraft AI',
   description: 'Create a professional resume and cover letter with AI.',
 };
 

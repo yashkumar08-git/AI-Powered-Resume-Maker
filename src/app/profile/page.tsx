@@ -27,6 +27,14 @@ export default function ProfilePage() {
 
   const getInitials = (email: string | null | undefined) => {
     if (!email) return 'AD';
+    const name = user?.displayName;
+    if (name) {
+      const names = name.split(' ');
+      if (names.length > 1) {
+        return `${names[0][0]}${names[1][0]}`.toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
     return email.substring(0, 2).toUpperCase();
   }
 
@@ -46,7 +54,7 @@ export default function ProfilePage() {
                 <AvatarImage src={user.photoURL || "https://placehold.co/100x100.png"} alt="User avatar" data-ai-hint="user avatar"/>
                 <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
             </Avatar>
-            <CardTitle className="text-2xl">{user.displayName || "User"}</CardTitle>
+            <CardTitle className="text-2xl">{user.displayName || user.email}</CardTitle>
             <CardDescription>{user.email}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 mt-4">
