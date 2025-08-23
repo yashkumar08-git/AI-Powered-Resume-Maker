@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { handleCustomizeResumeAction } from "@/app/actions";
+import { handleCustomizeResumeAction, fetchResumeData } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingState } from "@/components/LoadingState";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon } from "lucide-react";
+import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -99,10 +99,10 @@ function assembleResume(values: FormValues): string {
   return resume;
 }
 
-
 export default function Home() {
   const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormLoading, setIsFormLoading] = useState(true);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -127,11 +127,31 @@ export default function Home() {
     },
   });
 
-  useEffect(() => {
-    if(user && user.email) {
-      form.setValue('email', user.email);
+  const loadDataForUser = useCallback(async (userId: string, userEmail: string) => {
+    setIsFormLoading(true);
+    const { success, data } = await fetchResumeData(userId);
+    if (success && data) {
+      form.reset(data);
+      toast({
+        title: "Welcome Back!",
+        description: "Your saved resume data has been loaded.",
+      });
+    } else {
+        // Set email for new users
+        form.setValue('email', userEmail);
     }
-  }, [user, form]);
+    setIsFormLoading(false);
+  }, [form, toast]);
+
+
+  useEffect(() => {
+    if (!authLoading && user) {
+        loadDataForUser(user.uid, user.email!);
+    } else if (!authLoading && !user) {
+        // Not logged in, stop loading
+        setIsFormLoading(false);
+    }
+  }, [user, authLoading, loadDataForUser]);
 
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
@@ -162,11 +182,15 @@ export default function Home() {
     setResult(null);
 
     const resume = assembleResume(values);
-    const response = await handleCustomizeResumeAction({
-      resume: resume, 
-      jobDescription: values.jobDescription,
-      photoDataUri: values.photo,
-    });
+    const response = await handleCustomizeResumeAction(
+      {
+        resume: resume, 
+        jobDescription: values.jobDescription,
+        photoDataUri: values.photo,
+      },
+      values,
+      user?.uid || null
+    );
 
     setIsLoading(false);
     if (response.success && response.data) {
@@ -187,12 +211,31 @@ export default function Home() {
 
   const handleCreateNew = () => {
     setResult(null);
-    form.reset();
-    if(user && user.email) {
-      form.setValue('email', user.email);
-    }
+    form.reset({
+      name: "",
+      professionalTitle: "",
+      email: user?.email || "",
+      phone: "",
+      linkedin: "",
+      location: "",
+      website: "",
+      experiences: [{ title: "", company: "", dates: "", description: "" }],
+      educations: [{ degree: "", school: "", year: "", percentage: "" }],
+      skills: "",
+      jobDescription: "",
+      photo: "",
+    });
     setPhotoPreview(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  if (authLoading || isFormLoading) {
+    return (
+       <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+         <p className="text-lg text-muted-foreground">Loading your workspace...</p>
+       </div>
+    );
   }
 
   return (
