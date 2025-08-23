@@ -23,35 +23,35 @@ export function Header() {
     router.push('/login');
   };
 
-  const navLinks = (
-    <div className="flex flex-col md:flex-row items-center gap-2 w-full">
+  const AuthButtons = () => (
+    <>
       {loading ? (
-        <>
+        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
           <div className="hidden sm:block">
             <Skeleton className="h-6 w-32" />
           </div>
           <Skeleton className="h-10 w-20" />
           <Skeleton className="h-10 w-24" />
-        </>
+        </div>
       ) : user ? (
-        <>
+        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
           <p className="text-sm text-muted-foreground hidden sm:block">Welcome, {user.email}</p>
           <Button variant="ghost" onClick={handleSignOut} className="w-full md:w-auto">
             <LogOut />
             Logout
           </Button>
-        </>
+        </div>
       ) : (
-        <>
+        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
           <Button variant="ghost" asChild className="w-full md:w-auto">
             <Link href="/login"><LogIn/>Login</Link>
           </Button>
           <Button variant="default" asChild className="w-full md:w-auto">
             <Link href="/signup"><UserPlus/>Sign Up</Link>
           </Button>
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 
   return (
@@ -64,7 +64,7 @@ export function Header() {
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
         <div className="hidden md:flex items-center gap-2">
-          {navLinks}
+          <AuthButtons />
         </div>
         <div className="md:hidden">
           <Sheet>
@@ -75,7 +75,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent>
               <div className="flex flex-col items-center justify-center h-full gap-4 p-4">
-                {navLinks}
+                <AuthButtons />
               </div>
             </SheetContent>
           </Sheet>
