@@ -16,7 +16,7 @@ const CustomizeResumeInputSchema = z.object({
   resume: z
     .string()
     .describe('The resume of the user as plain text.'),
-  jobDescription: z.string().describe('The job description to customize the resume to.'),
+  jobDescription: z.string().optional().default('').describe('The job description to customize the resume to.'),
   photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
 });
 export type CustomizeResumeInput = z.infer<typeof CustomizeResumeInputSchema>;
@@ -88,7 +88,7 @@ const coverLetterPrompt = ai.definePrompt({
     model: 'googleai/gemini-1.5-flash-latest',
     input: {schema: z.object({
       resumeJson: z.string(), // Expecting the resume as a JSON string
-      jobDescription: z.string(),
+      jobDescription: z.string().optional().default(''),
     })},
     output: {schema: z.string()},
     prompt: `You are an expert career advisor. Your task is to write a compelling and professional cover letter based on the provided information.
@@ -132,7 +132,7 @@ const customizeResumeFlow = ai.defineFlow(
     const coverLetterResult = await coverLetterPrompt({
         // Pass the generated resume as a JSON string to the next prompt
         resumeJson: JSON.stringify(customizedResume, null, 2),
-        jobDescription: input.jobDescription
+        jobDescription: input.jobDescription || "",
     });
 
     const coverLetter = coverLetterResult.output;
