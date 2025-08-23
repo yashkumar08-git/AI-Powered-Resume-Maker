@@ -134,13 +134,13 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   };
 
   const handleEmail = (isCoverLetter: boolean) => {
-    if (!user || !user.email) {
-      toast({
-        variant: "destructive",
-        title: "Could not send email.",
-        description: "You must be logged in to use this feature."
-      })
-      return;
+    const toEmail = user?.email || '';
+
+    if (!user) {
+        toast({
+            title: "Your Email App is Opening",
+            description: "Please enter your email address in the 'To' field.",
+        });
     }
     
     const subject = isCoverLetter 
@@ -156,23 +156,21 @@ Please find my resume attached for your consideration.
 Thank you,
 ${customizedResume.name}`;
     
-    const mailtoLink = `mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
   };
 
 
   const DocumentActions = ({ contentRef, filename, isCoverLetter = false, isResume = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean, isResume?: boolean }) => (
     <div className="flex items-center gap-2 flex-wrap">
-      {user && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleEmail(isCoverLetter)}
-        >
-          <Mail className="mr-2 h-4 w-4" />
-          Mail
-        </Button>
-      )}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleEmail(isCoverLetter)}
+      >
+        <Mail className="mr-2 h-4 w-4" />
+        Mail
+      </Button>
       <Button
         variant="outline"
         size="sm"
