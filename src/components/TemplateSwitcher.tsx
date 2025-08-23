@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Paintbrush } from "lucide-react";
 
-export type Template = "modern" | "classic" | "creative";
+export type Template = "modern" | "classic" | "creative" | "professional" | "elegant";
 
 interface TemplateSwitcherProps {
   activeTemplate: Template;
@@ -39,6 +39,8 @@ export function TemplateSwitcher({ activeTemplate, onTemplateChange }: TemplateS
           <DropdownMenuRadioItem value="modern">Modern</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="classic">Classic</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="creative">Creative</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="professional">Professional</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="elegant">Elegant</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,0 +1,95 @@
+
+.template-elegant {
+    font-family: 'Garamond', 'Baskerville', 'Times New Roman', serif;
+    color: #2c3e50;
+    border-top: 6px solid #c0392b;
+}
+
+.template-elegant .resume-container {
+    padding-top: 2rem;
+}
+
+.template-elegant .resume-name {
+    text-align: center;
+    font-weight: normal;
+    font-size: 3rem;
+    letter-spacing: 4px;
+    color: #2c3e50;
+    text-transform: uppercase;
+}
+
+.template-elegant .resume-title {
+    text-align: center;
+    color: #c0392b;
+    font-size: 1.25rem;
+    font-weight: normal;
+    letter-spacing: 2px;
+}
+
+.template-elegant .resume-header {
+    flex-direction: column;
+    align-items: center;
+    border: none;
+    margin-bottom: 2rem;
+}
+
+.template-elegant .resume-contact-info {
+    justify-content: center;
+    gap: 1.5rem;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.template-elegant .resume-section-title {
+    font-weight: bold;
+    font-style: italic;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #c0392b;
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.template-elegant .resume-section-title svg {
+    display: none;
+}
+
+.template-elegant .resume-item {
+    padding-bottom: 1rem;
+    border-bottom: 1px dotted #bdc3c7;
+}
+
+.template-elegant .resume-item:last-child {
+    border-bottom: none;
+}
+
+.template-elegant .resume-item-title {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.template-elegant .resume-item-subtitle {
+    font-style: italic;
+    color: #34495e;
+    font-weight: normal;
+}
+
+.template-elegant .resume-skills {
+    justify-content: center;
+}
+
+.template-elegant .resume-skill-item {
+    background-color: transparent;
+    color: #c0392b;
+    border: 1px solid #c0392b;
+    font-weight: normal;
+    border-radius: 0;
+    font-size: 0.9rem;
+}
+
+.template-elegant .resume-photo {
+    display: none;
+}

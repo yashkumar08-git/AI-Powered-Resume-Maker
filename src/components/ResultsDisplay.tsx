@@ -21,6 +21,8 @@ import { TemplateSwitcher, type Template } from "@/components/TemplateSwitcher";
 import "@/components/resume-templates/modern.css";
 import "@/components/resume-templates/classic.css";
 import "@/components/resume-templates/creative.css";
+import "@/components/resume-templates/professional.css";
+import "@/components/resume-templates/elegant.css";
 import { cn } from "@/lib/utils";
 
 
@@ -223,7 +225,7 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
               <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
                 <div ref={resumeRef} className={cn("p-6 sm:p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed resume-container", `template-${activeTemplate}`)}>
                   {/* Header */}
-                  <div className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 resume-header gap-4">
+                  <header className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 resume-header gap-4">
                     <div className="flex-1">
                       <h1 className="text-3xl md:text-5xl font-extrabold text-gray-800 tracking-tight resume-name">{customizedResume.name}</h1>
                       {customizedResume.professionalTitle && <p className="text-lg md:text-2xl text-primary font-semibold mt-2 resume-title">{customizedResume.professionalTitle}</p>}
@@ -231,7 +233,7 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                     {customizedResume.photoDataUri && (
                        <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={120} height={120} className="rounded-full object-cover w-24 h-24 sm:w-32 sm:h-32 border-4 border-primary/50 shadow-md resume-photo" />
                     )}
-                  </div>
+                  </header>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-between items-start sm:items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 resume-contact-info gap-4">
                     {customizedResume.email && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><MailIcon size={16} className="text-primary shrink-0"/> {customizedResume.email}</p>}
                     {customizedResume.phone && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Phone size={16} className="text-primary shrink-0"/> {customizedResume.phone}</p>}
@@ -241,13 +243,13 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                   </div>
                   
                   {/* Summary */}
-                  <div className="mb-8 resume-section">
+                  <section className="mb-8 resume-section">
                     <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><User/> Professional Summary</h2>
                     <p className="text-sm sm:text-base resume-section-content">{customizedResume.summary}</p>
-                  </div>
+                  </section>
 
                   {/* Work Experience */}
-                  <div className="mb-8 resume-section">
+                  <section className="mb-8 resume-section">
                     <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Briefcase/> Work Experience</h2>
                     {customizedResume.experience.map((exp, index) => (
                       <div key={index} className="mb-6 resume-item">
@@ -259,10 +261,10 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                         <p className="mt-2 text-sm sm:text-base whitespace-pre-line resume-item-description">{exp.description}</p>
                       </div>
                     ))}
-                  </div>
+                  </section>
 
                   {/* Education */}
-                  <div className="mb-8 resume-section">
+                  <section className="mb-8 resume-section">
                     <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><GraduationCap/> Education</h2>
                     {customizedResume.education.map((edu, index) => (
                       <div key={index} className="flex flex-col sm:flex-row justify-between sm:items-start mb-4 resume-item">
@@ -274,17 +276,17 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                         <p className="text-sm sm:text-base text-gray-600 font-medium resume-item-dates mt-1 sm:mt-0">{edu.year}</p>
                       </div>
                     ))}
-                  </div>
+                  </section>
 
                   {/* Skills */}
-                  <div className="resume-section">
+                  <section className="resume-section resume-skills-container">
                     <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Star/> Skills</h2>
                     <div className="flex flex-wrap gap-2 sm:gap-3 resume-skills">
                       {customizedResume.skills.map((skill, index) => (
                         <span key={index} className="bg-primary/10 text-primary-foreground font-semibold px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-base resume-skill-item">{skill}</span>
                       ))}
                     </div>
-                  </div>
+                  </section>
                 </div>
               </div>
             </CardContent>
