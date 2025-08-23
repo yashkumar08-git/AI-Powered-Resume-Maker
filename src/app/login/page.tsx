@@ -60,7 +60,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-full py-12">
+    <div className="flex items-center justify-center min-h-full p-4 sm:p-6 md:p-12">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>

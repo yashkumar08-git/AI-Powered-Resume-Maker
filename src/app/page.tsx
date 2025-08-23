@@ -488,7 +488,7 @@ export default function Home() {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              <Button type="submit" size="lg" className="w-full text-lg" disabled={isLoading}>
+              <Button type="submit" size="lg" className="w-full text-lg mt-8" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader className="mr-2 animate-spin" />
