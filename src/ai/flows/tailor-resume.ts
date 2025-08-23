@@ -110,6 +110,9 @@ const customizeResumeFlow = ai.defineFlow(
     ]);
 
     const customizedResume = resumeResult.output!;
+    if (input.photoDataUri) {
+        customizedResume.photoDataUri = input.photoDataUri;
+    }
 
     return {
       customizedResume,
