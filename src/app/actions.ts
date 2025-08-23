@@ -5,8 +5,8 @@ import { customizeResume, CustomizeResumeOutput } from "@/ai/flows/tailor-resume
 import { z } from "zod";
 
 const formSchema = z.object({
-  resume: z.string(),
-  jobDescription: z.string(),
+  resume: z.string().optional().default(''),
+  jobDescription: z.string().optional().default(''),
   photoDataUri: z.string().optional(),
 });
 
@@ -15,7 +15,7 @@ type ActionResponse =
   | { success: false; error: string };
 
 export async function handleCustomizeResumeAction(
-  formData: { resume: string; jobDescription: string; photoDataUri?: string },
+  formData: { resume?: string; jobDescription?: string; photoDataUri?: string },
 ): Promise<ActionResponse> {
   const validation = formSchema.safeParse(formData);
 
