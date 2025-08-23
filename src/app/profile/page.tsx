@@ -11,19 +11,52 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Loader } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Loader, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getSavedResumesAction } from "@/app/actions";
+import { TailorResumeOutput } from "@/ai/flows/tailor-resume";
+import { formatDistanceToNow } from 'date-fns';
+import { Skeleton } from "@/components/ui/skeleton";
+
+type SavedResume = TailorResumeOutput & { id: string, createdAt: { seconds: number, nanoseconds: number } };
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [resumes, setResumes] = useState<SavedResume[]>([]);
+  const [loadingResumes, setLoadingResumes] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (user) {
+      const fetchResumes = async () => {
+        setLoadingResumes(true);
+        const result = await getSavedResumesAction(user.uid);
+        if (result.success && result.data) {
+          // Sort resumes by creation date, newest first
+          const sortedResumes = result.data.sort((a, b) => {
+            const dateA = a.createdAt?.seconds || 0;
+            const dateB = b.createdAt?.seconds || 0;
+            return dateB - dateA;
+          });
+          setResumes(sortedResumes as SavedResume[]);
+        }
+        setLoadingResumes(false);
+      };
+      fetchResumes();
+    }
+  }, [user]);
+
+  const handleViewResume = (resume: SavedResume) => {
+    localStorage.setItem('resumeResult', JSON.stringify(resume));
+    router.push('/results');
+  }
 
   const getInitials = (email: string | null | undefined) => {
     if (!email) return 'AD';
@@ -38,7 +71,7 @@ export default function ProfilePage() {
     return email.substring(0, 2).toUpperCase();
   }
 
-  if (loading || !user) {
+  if (authLoading || !user) {
     return (
       <div className="flex justify-center items-center min-h-full py-12">
         <Loader className="animate-spin" />
@@ -47,8 +80,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex justify-center items-start min-h-full py-12">
-      <Card className="w-full max-w-lg">
+    <div className="flex justify-center items-start min-h-full py-12 px-4">
+      <Card className="w-full max-w-2xl">
         <CardHeader className="items-center text-center">
             <Avatar className="h-24 w-24 mb-4">
                 <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
@@ -57,11 +90,36 @@ export default function ProfilePage() {
             <CardDescription>{user.email}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 mt-4">
-            <h3 className="text-lg font-semibold">Saved Resumes</h3>
-            <div className="border rounded-lg p-4 text-center">
-                <p className="text-muted-foreground">No saved resumes yet.</p>
-                <Button variant="link" onClick={() => router.push('/')}>Create a new resume</Button>
-            </div>
+            <h3 className="text-lg font-semibold px-2">Saved Resumes</h3>
+             {loadingResumes ? (
+              <div className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            ) : resumes.length > 0 ? (
+              <div className="border rounded-lg p-2 space-y-2">
+                {resumes.map((resume) => (
+                  <div key={resume.id} className="flex items-center justify-between p-3 hover:bg-accent rounded-md transition-colors">
+                    <div className="flex items-center gap-4">
+                       <FileText className="text-primary h-6 w-6" />
+                       <div>
+                          <p className="font-semibold">{resume.customizedResume.professionalTitle || 'Resume'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Created {resume.createdAt ? formatDistanceToNow(new Date(resume.createdAt.seconds * 1000), { addSuffix: true }) : 'recently'}
+                          </p>
+                       </div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => handleViewResume(resume)}>View</Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+                <div className="border rounded-lg p-4 text-center">
+                    <p className="text-muted-foreground">No saved resumes yet.</p>
+                    <Button variant="link" onClick={() => router.push('/')}>Create a new resume</Button>
+                </div>
+            )}
         </CardContent>
       </Card>
     </div>

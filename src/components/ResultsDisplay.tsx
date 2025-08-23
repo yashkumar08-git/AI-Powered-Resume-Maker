@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2 } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2, Save, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -24,6 +24,8 @@ import "@/components/resume-templates/creative.css";
 import "@/components/resume-templates/professional.css";
 import "@/components/resume-templates/elegant.css";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { saveResumeAction } from "@/app/actions";
 
 
 interface ResultsDisplayProps {
@@ -37,6 +39,8 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const coverLetterRef = useRef<HTMLDivElement>(null);
   const { customizedResume, coverLetter } = result;
   const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
+  const { user } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
 
 
   const downloadTextFile = (content: string, filename: string) => {
@@ -134,6 +138,32 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
     }
   };
 
+  const handleSaveResume = async () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Not Logged In",
+        description: "You must be logged in to save your resume.",
+      });
+      return;
+    }
+    setIsSaving(true);
+    const response = await saveResumeAction(result, user.uid);
+    setIsSaving(false);
+    if (response.success) {
+      toast({
+        title: "Resume Saved!",
+        description: "Your resume has been successfully saved to your profile.",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Save Failed",
+        description: response.error || "An unknown error occurred.",
+      });
+    }
+  };
+
 
   const DocumentActions = ({ contentRef, filename }: { contentRef: React.RefObject<HTMLDivElement>, filename: string }) => (
     <div className="flex items-center gap-2 flex-wrap">
@@ -192,8 +222,18 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
           <div className="flex items-center gap-4 flex-wrap justify-start">
              <Button onClick={onStartOver} variant="outline">
                 <FilePlus2 className="mr-2 h-4 w-4" />
-                Create New Resume
+                Create New
             </Button>
+            {user && (
+              <Button onClick={handleSaveResume} disabled={isSaving}>
+                {isSaving ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Save
+              </Button>
+            )}
             <TemplateSwitcher
                 activeTemplate={activeTemplate}
                 onTemplateChange={setActiveTemplate}

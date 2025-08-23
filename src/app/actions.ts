@@ -3,6 +3,9 @@
 
 import { tailorResume, TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { z } from "zod";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+
 
 const formSchema = z.object({
   resume: z.string(),
@@ -37,5 +40,46 @@ export async function handleTailorResumeAction(
     // Provide a more specific error message to the user.
     const errorMessage = e.message || "An unexpected error occurred. Please try again later.";
     return { success: false, error: `Failed to generate documents: ${errorMessage}` };
+  }
+}
+
+export async function saveResumeAction(
+  resumeData: TailorResumeOutput,
+  userId: string
+): Promise<{ success: boolean, error?: string, id?: string }> {
+  if (!userId) {
+    return { success: false, error: "User must be logged in to save." };
+  }
+
+  try {
+    const docRef = await addDoc(collection(db, "resumes"), {
+      userId,
+      ...resumeData,
+      createdAt: serverTimestamp(),
+    });
+    return { success: true, id: docRef.id };
+  } catch (error: any) {
+    console.error("Error saving resume to Firestore:", error);
+    return { success: false, error: error.message || "Failed to save resume." };
+  }
+}
+
+export async function getSavedResumesAction(
+  userId: string
+): Promise<{ success: boolean; data?: (TailorResumeOutput & { id: string, createdAt: any })[]; error?: string }> {
+  if (!userId) {
+    return { success: false, error: "User not found." };
+  }
+  try {
+    const q = query(collection(db, "resumes"), where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+    const resumes = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as (TailorResumeOutput & { id: string, createdAt: any })[];
+
+    return { success: true, data: resumes };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
 }
