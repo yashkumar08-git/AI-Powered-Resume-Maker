@@ -1,0 +1,52 @@
+
+.template-creative {
+    font-family: 'Montserrat', sans-serif;
+    color: #444;
+}
+
+.template-creative .resume-container {
+    border-left: 8px solid #e74c3c;
+    padding-left: 2rem;
+}
+
+.template-creative .resume-name {
+    color: #e74c3c;
+    font-weight: 800;
+}
+
+.template-creative .resume-title {
+    color: #555;
+    font-weight: 300;
+}
+
+.template-creative .resume-header {
+    border-bottom: none;
+}
+
+.template-creative .resume-section-title {
+    color: #e74c3c;
+    font-weight: 700;
+    border: none;
+}
+
+.template-creative .resume-section-title svg {
+    color: #e74c3c;
+}
+
+.template-creative .resume-item {
+    border-left: 3px solid #f1c40f;
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.template-creative .resume-skill-item {
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.template-creative .resume-photo {
+    border-radius: 10px;
+    border: 4px solid #e74c3c;
+}

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,12 @@ import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Image from "next/image";
+import { TemplateSwitcher, type Template } from "@/components/TemplateSwitcher";
+import "@/components/resume-templates/modern.css";
+import "@/components/resume-templates/classic.css";
+import "@/components/resume-templates/creative.css";
+import { cn } from "@/lib/utils";
+
 
 interface ResultsDisplayProps {
   result: CustomizeResumeOutput;
@@ -27,6 +33,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const resumeRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
   const { customizedResume, coverLetter } = result;
+  const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
+
 
   const downloadTextFile = (content: string, filename: string) => {
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -144,6 +152,10 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </div>
          
           <div className="flex items-center gap-4">
+            <TemplateSwitcher
+                activeTemplate={activeTemplate}
+                onTemplateChange={setActiveTemplate}
+              />
             <TabsList className="grid w-full max-w-sm grid-cols-2">
               <TabsTrigger value="resume">
                 <FileText className="mr-2 h-4 w-4" />
@@ -169,65 +181,65 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
             </CardHeader>
             <CardContent className="p-0">
               <div className="p-8 bg-transparent h-[800px] overflow-y-auto">
-                <div ref={resumeRef} className="p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed">
+                <div ref={resumeRef} className={cn("p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed resume-container", `template-${activeTemplate}`)}>
                   {/* Header */}
-                  <div className="flex items-center justify-between pb-6 mb-8">
+                  <div className="flex items-center justify-between pb-6 mb-8 resume-header">
                     <div className="flex-1">
-                      <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight">{customizedResume.name}</h1>
-                      {customizedResume.professionalTitle && <p className="text-2xl text-primary font-semibold mt-2">{customizedResume.professionalTitle}</p>}
+                      <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight resume-name">{customizedResume.name}</h1>
+                      {customizedResume.professionalTitle && <p className="text-2xl text-primary font-semibold mt-2 resume-title">{customizedResume.professionalTitle}</p>}
                     </div>
                     {customizedResume.photoDataUri && (
-                       <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={120} height={120} className="rounded-full object-cover w-32 h-32 border-4 border-primary/50 shadow-md" />
+                       <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={120} height={120} className="rounded-full object-cover w-32 h-32 border-4 border-primary/50 shadow-md resume-photo" />
                     )}
                   </div>
-                  <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200">
+                  <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 resume-contact-info">
                     {customizedResume.contact && <p className="flex items-center gap-3 text-sm"><MailIcon size={16} className="text-primary"/> {customizedResume.contact}</p>}
                     {customizedResume.location && <p className="flex items-center gap-3 text-sm"><MapPin size={16} className="text-primary"/> {customizedResume.location}</p>}
                     {customizedResume.website && <p className="flex items-center gap-3 text-sm"><Globe size={16} className="text-primary"/> <a href={customizedResume.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.website}</a></p>}
                   </div>
                   
                   {/* Summary */}
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3"><User/> Professional Summary</h2>
-                    <p className="text-base">{customizedResume.summary}</p>
+                  <div className="mb-8 resume-section">
+                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><User/> Professional Summary</h2>
+                    <p className="text-base resume-section-content">{customizedResume.summary}</p>
                   </div>
 
                   {/* Work Experience */}
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3"><Briefcase/> Work Experience</h2>
+                  <div className="mb-8 resume-section">
+                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Briefcase/> Work Experience</h2>
                     {customizedResume.experience.map((exp, index) => (
-                      <div key={index} className="mb-6">
+                      <div key={index} className="mb-6 resume-item">
                         <div className="flex justify-between items-baseline">
-                           <h3 className="text-xl font-bold text-gray-800">{exp.title}</h3>
-                           <p className="text-base text-gray-600 font-medium">{exp.dates}</p>
+                           <h3 className="text-xl font-bold text-gray-800 resume-item-title">{exp.title}</h3>
+                           <p className="text-base text-gray-600 font-medium resume-item-dates">{exp.dates}</p>
                         </div>
-                        <p className="text-lg font-semibold text-primary">{exp.company}</p>
-                        <p className="mt-2 text-base whitespace-pre-line">{exp.description}</p>
+                        <p className="text-lg font-semibold text-primary resume-item-subtitle">{exp.company}</p>
+                        <p className="mt-2 text-base whitespace-pre-line resume-item-description">{exp.description}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Education */}
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3"><GraduationCap/> Education</h2>
+                  <div className="mb-8 resume-section">
+                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><GraduationCap/> Education</h2>
                     {customizedResume.education.map((edu, index) => (
-                      <div key={index} className="flex justify-between items-start mb-4">
+                      <div key={index} className="flex justify-between items-start mb-4 resume-item">
                         <div>
-                            <h3 className="text-xl font-bold text-gray-800">{edu.degree}</h3>
-                            <p className="text-lg font-semibold text-primary">{edu.school}</p>
-                             {edu.percentage && <p className="text-base text-gray-600 mt-1">Percentage/GPA: {edu.percentage}</p>}
+                            <h3 className="text-xl font-bold text-gray-800 resume-item-title">{edu.degree}</h3>
+                            <p className="text-lg font-semibold text-primary resume-item-subtitle">{edu.school}</p>
+                             {edu.percentage && <p className="text-base text-gray-600 mt-1 resume-item-gpa">Percentage/GPA: {edu.percentage}</p>}
                         </div>
-                        <p className="text-base text-gray-600 font-medium">{edu.year}</p>
+                        <p className="text-base text-gray-600 font-medium resume-item-dates">{edu.year}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Skills */}
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3"><Star/> Skills</h2>
-                    <div className="flex flex-wrap gap-3">
+                  <div className="resume-section">
+                    <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Star/> Skills</h2>
+                    <div className="flex flex-wrap gap-3 resume-skills">
                       {customizedResume.skills.map((skill, index) => (
-                        <span key={index} className="bg-primary/10 text-primary-foreground font-semibold px-4 py-2 rounded-full text-base">{skill}</span>
+                        <span key={index} className="bg-primary/10 text-primary-foreground font-semibold px-4 py-2 rounded-full text-base resume-skill-item">{skill}</span>
                       ))}
                     </div>
                   </div>
@@ -262,5 +274,3 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     </div>
   );
 }
-
-    
