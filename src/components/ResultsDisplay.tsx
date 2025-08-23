@@ -22,7 +22,6 @@ import "@/components/resume-templates/modern.css";
 import "@/components/resume-templates/classic.css";
 import "@/components/resume-templates/creative.css";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
 
 
 interface ResultsDisplayProps {
@@ -35,7 +34,6 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const coverLetterRef = useRef<HTMLDivElement>(null);
   const { customizedResume, coverLetter } = result;
   const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
-  const { user } = useAuth();
 
 
   const downloadTextFile = (content: string, filename: string) => {
@@ -133,44 +131,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     }
   };
 
-  const handleEmail = (isCoverLetter: boolean) => {
-    const toEmail = user?.email || '';
 
-    if (!user) {
-        toast({
-            title: "Your Email App is Opening",
-            description: "Please enter your email address in the 'To' field.",
-        });
-    }
-    
-    const subject = isCoverLetter 
-        ? "Your Generated Cover Letter" 
-        : `Application for [Job Title] from ${customizedResume.name}`;
-
-    const body = isCoverLetter 
-        ? coverLetter 
-        : `Dear [Hiring Manager],
-
-Please find my resume attached for your consideration.
-
-Thank you,
-${customizedResume.name}`;
-    
-    const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
-  };
-
-
-  const DocumentActions = ({ contentRef, filename, isCoverLetter = false, isResume = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean, isResume?: boolean }) => (
+  const DocumentActions = ({ contentRef, filename }: { contentRef: React.RefObject<HTMLDivElement>, filename: string }) => (
     <div className="flex items-center gap-2 flex-wrap">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => handleEmail(isCoverLetter)}
-      >
-        <Mail className="mr-2 h-4 w-4" />
-        Mail
-      </Button>
       <Button
         variant="outline"
         size="sm"
@@ -249,7 +212,7 @@ ${customizedResume.name}`;
                   Optimized for the job description.
                 </CardDescription>
               </div>
-              <DocumentActions filename="customized-resume" contentRef={resumeRef} isResume={true} />
+              <DocumentActions filename="customized-resume" contentRef={resumeRef} />
             </CardHeader>
             <CardContent className="p-0">
               <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
@@ -331,7 +294,7 @@ ${customizedResume.name}`;
                   A compelling letter to introduce yourself.
                 </CardDescription>
               </div>
-               <DocumentActions filename="cover-letter" contentRef={coverLetterRef} isCoverLetter={true} />
+               <DocumentActions filename="cover-letter" contentRef={coverLetterRef} />
             </CardHeader>
             <CardContent className="p-0">
               <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
@@ -348,3 +311,5 @@ ${customizedResume.name}`;
     </div>
   );
 }
+
+    
