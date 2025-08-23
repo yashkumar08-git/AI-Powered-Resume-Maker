@@ -5,10 +5,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { handleCustomizeResumeAction, fetchResumeData } from "@/app/actions";
+import { handleCustomizeResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 
 import { Button } from "@/components/ui/button";
@@ -40,7 +39,6 @@ import { LoadingState } from "@/components/LoadingState";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const experienceSchema = z.object({
   title: z.string(),
@@ -109,12 +107,11 @@ function assembleResume(values: FormValues): string {
 export default function Home() {
   const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isFormLoading, setIsFormLoading] = useState(true);
+  const [isFormLoading, setIsFormLoading] = useState(false);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -134,40 +131,11 @@ export default function Home() {
     },
   });
 
-  const loadDataForUser = useCallback(async (userId: string, userEmail: string) => {
-    const { success, data, error } = await fetchResumeData(userId);
-    if (success && data) {
-      form.reset({ ...data, email: userEmail }); // ensure email is up-to-date
-      toast({
-        title: "Welcome Back!",
-        description: "Your saved resume data has been loaded.",
-      });
-    } else {
-        // Set email for new users or if data fetch fails
-        form.reset();
-        form.setValue('email', userEmail);
-        if(error) {
-          toast({
-            variant: "destructive",
-            title: "Could not load data",
-            description: error,
-          });
-        }
-    }
-    setIsFormLoading(false);
-  }, [form, toast]);
-
-
   useEffect(() => {
-    if (!authLoading) {
-      if (user) {
-        loadDataForUser(user.uid, user.email!);
-      } else {
-        // Not logged in, stop loading
-        setIsFormLoading(false);
-      }
+    if (user?.email) {
+      form.setValue('email', user.email);
     }
-  }, [user, authLoading, loadDataForUser]);
+  }, [user, form]);
 
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
@@ -208,15 +176,12 @@ export default function Home() {
       return;
     }
 
-
     const response = await handleCustomizeResumeAction(
       {
         resume: resume, 
         jobDescription: values.jobDescription || "",
         photoDataUri: values.photo,
-      },
-      values,
-      user?.uid || null
+      }
     );
 
     setIsLoading(false);
@@ -260,7 +225,7 @@ export default function Home() {
     return (
        <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-         <p className="text-lg text-muted-foreground">Loading your workspace...</p>
+         <p className="text-lg text-muted-foreground">Loading...</p>
        </div>
     );
   }
