@@ -5,12 +5,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  "projectId": "careercraft-ai-7utd3",
+  "appId": "1:369594218242:web:23f02b71b2c4f25b1b741b",
+  "storageBucket": "careercraft-ai-7utd3.firebasestorage.app",
+  "apiKey": "AIzaSyDm3rwgToB-pXXxa9zpy-luH5BO9gqTCrw",
+  "authDomain": "careercraft-ai-7utd3.firebaseapp.com",
+  "measurementId": "",
+  "messagingSenderId": "369594218242"
 };
 
 // Initialize Firebase
