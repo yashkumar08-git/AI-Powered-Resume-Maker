@@ -17,11 +17,18 @@ import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 
 export function Header() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const handleSignOut = async () => {
     await signOut(auth);
@@ -51,7 +58,7 @@ export function Header() {
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
         <div className="flex items-center gap-2">
-            {loading ? (
+            {(loading || !isClient) ? (
               <Loader className="animate-spin"/>
             ) : user ? (
                <DropdownMenu>
