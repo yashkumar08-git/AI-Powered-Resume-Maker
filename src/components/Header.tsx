@@ -48,7 +48,7 @@ export function Header() {
           <div className="p-2 bg-primary/10 group-hover:bg-primary/20 rounded-full transition-all duration-300 transform group-hover:scale-110">
             <Wand2 className="h-6 w-6 text-primary transition-transform duration-300 group-hover:rotate-12" />
           </div>
-          <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">CareerCraft AI</span>
+          <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
         <div className="flex items-center gap-2">
             {loading ? (
