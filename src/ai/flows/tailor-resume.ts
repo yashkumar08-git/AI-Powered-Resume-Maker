@@ -62,7 +62,7 @@ const resumeOnlyPrompt = ai.definePrompt({
     output: {schema: ResumeSchema},
     prompt: `You are an expert resume writer. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. Structure the output as a JSON object that conforms to the provided schema.
 
-If a photo is provided, include the photo's data URI in the 'photoDataUri' field of the resume object. Otherwise, leave it null.
+If a photo is provided, include the photo's data URI in the 'photoDataUri' field of the resume object.
 
 Resume:
 {{{resume}}}
@@ -78,7 +78,10 @@ Photo:
 
 const coverLetterOnlyPrompt = ai.definePrompt({
     name: 'coverLetterOnlyPrompt',
-    input: {schema: CustomizeResumeInputSchema},
+    input: {schema: z.object({
+      resume: z.string(),
+      jobDescription: z.string(),
+    })},
     output: {schema: z.string()},
     prompt: `You are an expert career advisor. Based on the provided resume and job description, write a compelling and professional cover letter.
 
@@ -97,17 +100,20 @@ const customizeResumeFlow = ai.defineFlow(
     inputSchema: CustomizeResumeInputSchema,
     outputSchema: CustomizeResumeOutputSchema,
   },
-  async input => {
+  async (input) => {
     const [resumeResult, coverLetterResult] = await Promise.all([
-        resumeOnlyPrompt(input),
-        coverLetterOnlyPrompt(input),
+      resumeOnlyPrompt(input),
+      coverLetterOnlyPrompt({
+        resume: input.resume,
+        jobDescription: input.jobDescription,
+      }),
     ]);
-    
+
     const customizedResume = resumeResult.output!;
-    
+
     return {
-        customizedResume,
-        coverLetter: coverLetterResult.output!,
+      customizedResume,
+      coverLetter: coverLetterResult.output!,
     };
   }
 );
