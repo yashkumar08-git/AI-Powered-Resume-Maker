@@ -21,26 +21,50 @@ import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Loader } from "lucide-react";
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, { message: "Password is required." }),
-});
 
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [captcha, setCaptcha] = useState({ num1: 0, num2: 0, answer: 0 });
+
+  const formSchema = useMemo(() => z.object({
+    email: z.string().email(),
+    password: z.string().min(1, { message: "Password is required." }),
+    captcha: z.string().refine((val) => parseInt(val) === captcha.answer, {
+      message: "Incorrect captcha answer.",
+    }),
+  }), [captcha.answer]);
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
+      captcha: "",
     },
   });
+  
+  // Reset form with new default values when captcha changes
+  useEffect(() => {
+    form.reset({
+      email: form.getValues("email"),
+      password: form.getValues("password"),
+      captcha: "",
+    });
+  }, [captcha, form]);
+
+  const generateCaptcha = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    setCaptcha({ num1, num2, answer: num1 + num2 });
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -54,6 +78,7 @@ export default function LoginPage() {
         title: "Login Failed",
         description: error.message,
       });
+      generateCaptcha(); // Regenerate captcha on failed login
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +117,21 @@ export default function LoginPage() {
                     <Label htmlFor="password">Password</Label>
                     <FormControl>
                       <Input id="password" type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="captcha"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="captcha">
+                      Security Question: What is {captcha.num1} + {captcha.num2}?
+                    </Label>
+                    <FormControl>
+                      <Input id="captcha" type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
