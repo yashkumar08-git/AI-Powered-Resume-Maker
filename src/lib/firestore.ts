@@ -8,14 +8,14 @@ try {
     ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
     : undefined;
 
-  if (serviceAccount) {
+  if (serviceAccount && Object.keys(serviceAccount).length > 0) {
     if (!getApps().length) {
       initializeApp({
         credential: cert(serviceAccount),
       });
     }
   } else {
-    console.warn("Firebase service account key is not set. Firestore functionality will be disabled.");
+    console.warn("Firebase service account key is not set or is empty. Firestore functionality will be disabled.");
   }
 } catch (error) {
   console.error("Failed to initialize Firebase Admin SDK:", error);
