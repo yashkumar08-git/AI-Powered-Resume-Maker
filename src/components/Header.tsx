@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Wand2, LogOut, User as UserIcon, LayoutGrid, Loader } from 'lucide-react';
+import { Wand2, LogOut, User as UserIcon, Home, Loader } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,6 +72,12 @@ export function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/">
+                        <Home className="mr-2 h-4 w-4"/>
+                        Home
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/profile">
                         <UserIcon className="mr-2 h-4 w-4"/>
