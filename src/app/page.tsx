@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { handleCustomizeResumeAction, getResumeDataAction } from "@/app/actions";
+import { handleCustomizeResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 import { useAuth } from "@/hooks/use-auth";
@@ -107,7 +107,6 @@ function assembleResume(values: FormValues): string {
 export default function Home() {
   const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isFormLoading, setIsFormLoading] = useState(true);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -130,35 +129,12 @@ export default function Home() {
       photo: "",
     },
   });
-
-  const loadUserData = useCallback(async (userId: string) => {
-    setIsFormLoading(true);
-    try {
-      const data = await getResumeDataAction(userId);
-      if (data && data.formData) {
-        form.reset(data.formData);
-        if (data.formData.photo) {
-          setPhotoPreview(data.formData.photo);
-        }
-        toast({ title: "Welcome back!", description: "Your previous work has been loaded." });
-      }
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Could not load your data." });
-    } finally {
-      setIsFormLoading(false);
-    }
-  }, [form, toast]);
   
   useEffect(() => {
-    if (!authLoading) {
-      if (user) {
-        form.setValue('email', user.email || '');
-        loadUserData(user.uid);
-      } else {
-        setIsFormLoading(false);
-      }
+    if (user && !authLoading) {
+      form.setValue('email', user.email || '');
     }
-  }, [user, authLoading, form, loadUserData]);
+  }, [user, authLoading, form]);
 
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
@@ -204,9 +180,7 @@ export default function Home() {
         resume: resume, 
         jobDescription: values.jobDescription || "",
         photoDataUri: values.photo,
-      },
-      user?.uid,
-      values
+      }
     );
 
     setIsLoading(false);
@@ -246,7 +220,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  if (authLoading || isFormLoading) {
+  if (authLoading) {
     return (
        <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />

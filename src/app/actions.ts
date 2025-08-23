@@ -2,7 +2,6 @@
 "use server";
 
 import { customizeResume, CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
-import { saveResumeData, getResumeData as getResumeDataFromDb } from "@/lib/firestore";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -17,8 +16,6 @@ type ActionResponse =
 
 export async function handleCustomizeResumeAction(
   formData: { resume: string; jobDescription: string; photoDataUri?: string },
-  userId?: string | null,
-  rawFormData?: any,
 ): Promise<ActionResponse> {
   const validation = formSchema.safeParse(formData);
 
@@ -38,25 +35,10 @@ export async function handleCustomizeResumeAction(
       photoDataUri: validation.data.photoDataUri,
     });
     
-    // If the user is logged in, save their raw form data.
-    if (userId && rawFormData) {
-      await saveResumeData(userId, rawFormData);
-    }
-    
     return { success: true, data: result };
   } catch (e) {
     console.error(e);
     // This provides a generic error message to the user for security.
     return { success: false, error: "Failed to generate documents. Please try again later." };
-  }
-}
-
-export async function getResumeDataAction(userId: string): Promise<any | null> {
-  try {
-    const data = await getResumeDataFromDb(userId);
-    return data;
-  } catch (error) {
-    console.error("Error fetching resume data:", error);
-    return null;
   }
 }
