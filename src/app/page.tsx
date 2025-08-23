@@ -56,7 +56,9 @@ const educationSchema = z.object({
 const formSchema = z.object({
   name: z.string(),
   professionalTitle: z.string().optional(),
-  contact: z.string(),
+  email: z.string().email({ message: "Invalid email address." }),
+  phone: z.string().optional(),
+  linkedin: z.string().optional(),
   location: z.string().optional(),
   website: z.string().optional(),
   experiences: z.array(experienceSchema),
@@ -71,7 +73,11 @@ type FormValues = z.infer<typeof formSchema>;
 function assembleResume(values: FormValues): string {
   let resume = `Name: ${values.name}\n`;
   if(values.professionalTitle) resume += `Professional Title: ${values.professionalTitle}\n`;
-  resume += `Contact: ${values.contact}\n`;
+  resume += `Contact:\n`;
+  resume += `- Email: ${values.email}\n`;
+  if(values.phone) resume += `- Phone: ${values.phone}\n`;
+  if(values.linkedin) resume += `- LinkedIn: ${values.linkedin}\n`;
+
   if(values.location) resume += `Location: ${values.location}\n`;
   if(values.website) resume += `Website: ${values.website}\n\n`;
 
@@ -103,7 +109,9 @@ export default function Home() {
     defaultValues: {
       name: "",
       professionalTitle: "",
-      contact: "",
+      email: "",
+      phone: "",
+      linkedin: "",
       location: "",
       website: "",
       experiences: [{ title: "", company: "", dates: "", description: "" }],
@@ -225,19 +233,47 @@ export default function Home() {
                             )}
                           />
                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Email</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="you@example.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                           <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">Phone</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="(123) 456-7890" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                         <FormField
-                          control={form.control}
-                          name="contact"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-semibold">Contact Information</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Email, Phone, LinkedIn URL" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            control={form.control}
+                            name="linkedin"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-semibold">LinkedIn URL</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://linkedin.com/in/yourprofile" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                               control={form.control}

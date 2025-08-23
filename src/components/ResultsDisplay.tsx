@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -161,7 +161,7 @@ ${customizedResume.name}`;
   };
 
 
-  const DocumentActions = ({ contentRef, filename, isCoverLetter = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean }) => (
+  const DocumentActions = ({ contentRef, filename, isCoverLetter = false, isResume = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean, isResume?: boolean }) => (
     <div className="flex items-center gap-2 flex-wrap">
       {user && (
         <Button
@@ -251,7 +251,7 @@ ${customizedResume.name}`;
                   Optimized for the job description.
                 </CardDescription>
               </div>
-              <DocumentActions filename="customized-resume" contentRef={resumeRef} />
+              <DocumentActions filename="customized-resume" contentRef={resumeRef} isResume={true} />
             </CardHeader>
             <CardContent className="p-0">
               <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
@@ -266,10 +266,12 @@ ${customizedResume.name}`;
                        <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={120} height={120} className="rounded-full object-cover w-24 h-24 sm:w-32 sm:h-32 border-4 border-primary/50 shadow-md resume-photo" />
                     )}
                   </div>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 resume-contact-info gap-4">
-                    {customizedResume.contact && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><MailIcon size={16} className="text-primary shrink-0"/> {customizedResume.contact}</p>}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-between items-start sm:items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 resume-contact-info gap-4">
+                    {customizedResume.email && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><MailIcon size={16} className="text-primary shrink-0"/> {customizedResume.email}</p>}
+                    {customizedResume.phone && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Phone size={16} className="text-primary shrink-0"/> {customizedResume.phone}</p>}
+                    {customizedResume.linkedin && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Linkedin size={16} className="text-primary shrink-0"/> <a href={customizedResume.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.linkedin.replace('https://', '').replace('www.', '')}</a></p>}
                     {customizedResume.location && <p className="flex items-center gap-3 text-xs sm:text-sm"><MapPin size={16} className="text-primary shrink-0"/> {customizedResume.location}</p>}
-                    {customizedResume.website && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Globe size={16} className="text-primary shrink-0"/> <a href={customizedResume.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.website}</a></p>}
+                    {customizedResume.website && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Globe size={16} className="text-primary shrink-0"/> <a href={customizedResume.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.website.replace('https://', '').replace('www.', '')}</a></p>}
                   </div>
                   
                   {/* Summary */}
