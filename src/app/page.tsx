@@ -98,7 +98,9 @@ function assembleResume(values: FormValues): string {
     });
   }
 
-  if(values.skills) resume += `\nSkills:\n${values.skills}`;
+  if (values.skills) {
+    resume += `\nSkills:\n${values.skills}`;
+  }
   return resume;
 }
 
@@ -508,5 +510,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
