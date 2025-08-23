@@ -177,11 +177,12 @@ export default function Home() {
     setResult(null);
     form.reset();
     setPhotoPreview(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
-      <div className="text-center max-w-3xl mx-auto animate-fade-in-up">
+      <div className="text-center max-w-3xl mx-auto animate-fade-in-up mb-8">
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground backdrop-blur-sm bg-black/10 rounded-md px-4 py-2 inline-block">
           AI-Powered Resume Maker
         </h1>
@@ -192,7 +193,7 @@ export default function Home() {
       </div>
 
       {!result && !isLoading && (
-         <Card className="mt-8 md:mt-12 max-w-4xl mx-auto animate-fade-in-up shadow-2xl shadow-primary/10 bg-gradient-to-br from-card to-background/50 transition-all duration-300 hover:shadow-primary/20" style={{ animationDelay: '0.4s' }}>
+         <Card className="mt-8 md:mt-12 max-w-4xl mx-auto animate-fade-in-up shadow-2xl shadow-primary/10 bg-gradient-to-br from-card to-background/50 transition-all duration-300 hover:shadow-primary/20 hover:scale-[1.02]" style={{ animationDelay: '0.4s' }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Wand2 className="text-primary"/>
