@@ -56,7 +56,7 @@ const educationSchema = z.object({
 const formSchema = z.object({
   name: z.string().optional(),
   professionalTitle: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address." }).optional(),
+  email: z.string().email({ message: "Invalid email address." }).optional().or(z.literal('')),
   phone: z.string().optional(),
   linkedin: z.string().optional(),
   location: z.string().optional(),
