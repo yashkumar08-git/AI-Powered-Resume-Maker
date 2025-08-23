@@ -200,21 +200,26 @@ export default function Home() {
 
   if (authLoading || !user) {
     return (
-       <div className="container mx-auto px-4 py-8 md:py-16">
-         <div className="text-center max-w-3xl mx-auto animate-fade-in-up mb-8">
-            <Skeleton className="h-16 w-3/4 mx-auto" />
-            <Skeleton className="h-6 w-full mt-4 mx-auto" />
-         </div>
-         <Card className="mt-8 md:mt-12 max-w-4xl mx-auto">
+       <div className="flex items-center justify-center min-h-[calc(100vh-200px)] w-full">
+         <Card className="w-full max-w-4xl mx-auto">
             <CardHeader>
               <Skeleton className="h-8 w-1/4" />
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-1/2 mt-2" />
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-10 w-full" />
+                <div className="space-y-2">
+                    <Skeleton className="h-6 w-1/5" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-6 w-1/5" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-6 w-1/5" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+                <Skeleton className="h-12 w-full mt-4" />
             </CardContent>
          </Card>
        </div>
@@ -248,7 +253,7 @@ export default function Home() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-                 <Accordion type="multiple" className="w-full">
+                 <Accordion type="multiple" className="w-full" defaultValue={["item-1", "item-2", "item-3", "item-4", "item-5"]}>
                   <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
                     <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">

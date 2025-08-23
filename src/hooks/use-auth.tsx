@@ -45,12 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = (email: string, pass: string) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, pass).finally(() => setLoading(false));
+    return createUserWithEmailAndPassword(auth, email, pass);
   };
 
   const signIn = (email: string, pass: string) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, pass).finally(() => setLoading(false));
+    return signInWithEmailAndPassword(auth, email, pass);
   };
 
   const signOut = () => {
