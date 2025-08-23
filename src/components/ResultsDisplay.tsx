@@ -63,15 +63,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     const element = ref.current;
     if (element) {
       // Temporarily override styles for PDF generation
-      const originalStyles = {
-        width: element.style.width,
-        height: element.style.height,
-        transform: element.style.transform,
-      };
-      element.style.width = '210mm'; // A4 width
-      element.style.height = '297mm'; // A4 height
-      element.style.transform = 'scale(1)';
-
+      const originalWidth = element.style.width;
+      element.style.width = '210mm';
 
       html2canvas(element, { 
         scale: 3, // Increase scale for better quality
@@ -80,6 +73,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
        }).then((canvas) => {
+        // Restore original styles
+        element.style.width = originalWidth;
+
         const imgData = canvas.toDataURL('image/png', 1.0);
         const pdf = new jsPDF('p', 'mm', 'a4', true);
         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -87,39 +83,29 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const ratio = canvasWidth / canvasHeight;
-        
+        let ratio = canvasWidth / canvasHeight;
+
         let imgWidth = pdfWidth;
         let imgHeight = imgWidth / ratio;
-        
-        // If image height is greater than pdf height, scale down
-        if (imgHeight > pdfHeight) {
-            imgHeight = pdfHeight;
-            imgWidth = imgHeight * ratio;
-        }
-
 
         let heightLeft = imgHeight;
         let position = 0;
-
-        // Add the first page
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-        heightLeft -= pdfHeight;
-
-
-        // Add subsequent pages if necessary
-        while (heightLeft > 0) {
-          position = position - pdfHeight;
-          pdf.addPage();
+        
+        if (imgHeight > pdfHeight) {
           pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
           heightLeft -= pdfHeight;
+
+          while (heightLeft > 0) {
+            position = position - pdfHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+            heightLeft -= pdfHeight;
+          }
+        } else {
+           pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
         }
 
         pdf.save(filename);
-         // Restore original styles
-        element.style.width = originalStyles.width;
-        element.style.height = originalStyles.height;
-        element.style.transform = originalStyles.transform;
       });
     }
   };
@@ -127,15 +113,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const downloadImage = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     const element = ref.current;
     if (element) {
-       const originalStyles = {
-        width: element.style.width,
-        height: element.style.height,
-        transform: element.style.transform,
-      };
+       const originalWidth = element.style.width;
       element.style.width = '1024px';
-      element.style.height = 'auto';
-      element.style.transform = 'scale(1)';
-
+      
       html2canvas(element, { 
         scale: 3, 
         backgroundColor: '#ffffff',
@@ -143,9 +123,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
        }).then((canvas) => {
-        element.style.width = originalStyles.width;
-        element.style.height = originalStyles.height;
-        element.style.transform = originalStyles.transform;
+        element.style.width = originalWidth;
         
         const link = document.createElement('a');
         link.download = filename;
@@ -155,11 +133,18 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     }
   };
 
-  const handleEmail = (contentRef: React.RefObject<HTMLDivElement>) => {
-    if (!user || !user.email || !contentRef.current) return;
+  const handleEmail = () => {
+    if (!user || !user.email) {
+      toast({
+        variant: "destructive",
+        title: "Could not send email.",
+        description: "You must be logged in to use this feature."
+      })
+      return;
+    }
     
     const subject = "Your Generated Resume & Cover Letter";
-    const body = contentRef.current.innerText;
+    const body = coverLetter;
     
     const mailtoLink = `mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
@@ -168,11 +153,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   const DocumentActions = ({ contentRef, filename, isCoverLetter = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean }) => (
     <div className="flex items-center gap-2 flex-wrap">
-      {isCoverLetter && (
+      {isCoverLetter && user && (
         <Button
           variant="outline"
           size="sm"
-          onClick={() => handleEmail(contentRef)}
+          onClick={handleEmail}
         >
           <Mail className="mr-2 h-4 w-4" />
           Mail
@@ -353,5 +338,3 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     </div>
   );
 }
-
-    
