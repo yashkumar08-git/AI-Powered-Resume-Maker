@@ -22,6 +22,7 @@ import "@/components/resume-templates/modern.css";
 import "@/components/resume-templates/classic.css";
 import "@/components/resume-templates/creative.css";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 
 interface ResultsDisplayProps {
@@ -34,6 +35,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const coverLetterRef = useRef<HTMLDivElement>(null);
   const { customizedResume, coverLetter } = result;
   const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
+  const { user } = useAuth();
 
 
   const downloadTextFile = (content: string, filename: string) => {
@@ -64,22 +66,21 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       const originalStyles = {
         width: element.style.width,
         height: element.style.height,
+        transform: element.style.transform,
       };
       element.style.width = '210mm'; // A4 width
-      element.style.height = 'auto';
+      element.style.height = '297mm'; // A4 height
+      element.style.transform = 'scale(1)';
+
 
       html2canvas(element, { 
-        scale: 2, 
+        scale: 3, // Increase scale for better quality
         backgroundColor: '#ffffff',
         useCORS: true,
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
        }).then((canvas) => {
-        // Restore original styles
-        element.style.width = originalStyles.width;
-        element.style.height = originalStyles.height;
-
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/png', 1.0);
         const pdf = new jsPDF('p', 'mm', 'a4', true);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -88,15 +89,25 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         const canvasHeight = canvas.height;
         const ratio = canvasWidth / canvasHeight;
         
-        const imgWidth = pdfWidth;
-        const imgHeight = imgWidth / ratio;
+        let imgWidth = pdfWidth;
+        let imgHeight = imgWidth / ratio;
+        
+        // If image height is greater than pdf height, scale down
+        if (imgHeight > pdfHeight) {
+            imgHeight = pdfHeight;
+            imgWidth = imgHeight * ratio;
+        }
+
 
         let heightLeft = imgHeight;
         let position = 0;
 
+        // Add the first page
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
         heightLeft -= pdfHeight;
 
+
+        // Add subsequent pages if necessary
         while (heightLeft > 0) {
           position = position - pdfHeight;
           pdf.addPage();
@@ -105,6 +116,10 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         }
 
         pdf.save(filename);
+         // Restore original styles
+        element.style.width = originalStyles.width;
+        element.style.height = originalStyles.height;
+        element.style.transform = originalStyles.transform;
       });
     }
   };
@@ -112,15 +127,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const downloadImage = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     const element = ref.current;
     if (element) {
-      const originalStyles = {
+       const originalStyles = {
         width: element.style.width,
         height: element.style.height,
+        transform: element.style.transform,
       };
       element.style.width = '1024px';
       element.style.height = 'auto';
+      element.style.transform = 'scale(1)';
 
       html2canvas(element, { 
-        scale: 2, 
+        scale: 3, 
         backgroundColor: '#ffffff',
         useCORS: true,
         windowWidth: element.scrollWidth,
@@ -128,17 +145,39 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
        }).then((canvas) => {
         element.style.width = originalStyles.width;
         element.style.height = originalStyles.height;
+        element.style.transform = originalStyles.transform;
         
         const link = document.createElement('a');
         link.download = filename;
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
       });
     }
   };
 
-  const DocumentActions = ({ contentRef, filename }: { contentRef: React.RefObject<HTMLDivElement>, filename: string }) => (
+  const handleEmail = (contentRef: React.RefObject<HTMLDivElement>) => {
+    if (!user || !user.email || !contentRef.current) return;
+    
+    const subject = "Your Generated Resume & Cover Letter";
+    const body = contentRef.current.innerText;
+    
+    const mailtoLink = `mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+  };
+
+
+  const DocumentActions = ({ contentRef, filename, isCoverLetter = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean }) => (
     <div className="flex items-center gap-2 flex-wrap">
+      {isCoverLetter && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleEmail(contentRef)}
+        >
+          <Mail className="mr-2 h-4 w-4" />
+          Mail
+        </Button>
+      )}
       <Button
         variant="outline"
         size="sm"
@@ -297,7 +336,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   A compelling letter to introduce yourself.
                 </CardDescription>
               </div>
-               <DocumentActions filename="cover-letter" contentRef={coverLetterRef} />
+               <DocumentActions filename="cover-letter" contentRef={coverLetterRef} isCoverLetter={true} />
             </CardHeader>
             <CardContent className="p-0">
               <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
@@ -314,3 +353,5 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     </div>
   );
 }
+
+    
