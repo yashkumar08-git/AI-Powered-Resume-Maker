@@ -156,11 +156,11 @@ export default function Home() {
     setIsLoading(true);
     setResult(null);
 
-    const resume = assembleResume(values);
+    const resumeText = assembleResume(values);
     
     const response = await handleCustomizeResumeAction(
       {
-        resume: resume, 
+        resume: resumeText, 
         jobDescription: values.jobDescription || "",
         photoDataUri: values.photo,
       }
