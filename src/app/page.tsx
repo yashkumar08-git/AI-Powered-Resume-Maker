@@ -57,45 +57,52 @@ const educationSchema = z.object({
 });
 
 const formSchema = z.object({
-  name: z.string(),
+  name: z.string().optional(),
   professionalTitle: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address." }),
+  email: z.string().email({ message: "Invalid email address." }).optional(),
   phone: z.string().optional(),
   linkedin: z.string().optional(),
   location: z.string().optional(),
   website: z.string().optional(),
   experiences: z.array(experienceSchema),
   educations: z.array(educationSchema),
-  skills: z.string(),
-  jobDescription: z.string(),
+  skills: z.string().optional(),
+  jobDescription: z.string().optional(),
   photo: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 function assembleResume(values: FormValues): string {
-  let resume = `Name: ${values.name}\n`;
+  let resume = "";
+  if (values.name) resume += `Name: ${values.name}\n`;
   if(values.professionalTitle) resume += `Professional Title: ${values.professionalTitle}\n`;
-  resume += `Email: ${values.email}\n`;
+  if (values.email) resume += `Email: ${values.email}\n`;
   if(values.phone) resume += `Phone: ${values.phone}\n`;
   if(values.linkedin) resume += `LinkedIn: ${values.linkedin}\n`;
 
   if(values.location) resume += `Location: ${values.location}\n`;
   if(values.website) resume += `Website: ${values.website}\n\n`;
+  
+  if (values.experiences && values.experiences.length > 0 && values.experiences[0].title) {
+    resume += "Work Experience:\n";
+    values.experiences.forEach(exp => {
+      resume += `- ${exp.title} at ${exp.company} (${exp.dates})\n  ${exp.description.replace(/\n/g, '\n  ')}\n`;
+    });
+  }
 
-  resume += "Work Experience:\n";
-  values.experiences.forEach(exp => {
-    resume += `- ${exp.title} at ${exp.company} (${exp.dates})\n  ${exp.description.replace(/\n/g, '\n  ')}\n`;
-  });
-  resume += "\nEducation:\n";
-  values.educations.forEach(edu => {
-    resume += `- ${edu.degree}, ${edu.school} (${edu.year})`;
-    if (edu.percentage) {
-      resume += ` - ${edu.percentage}`;
-    }
-    resume += '\n';
-  });
-  resume += `\nSkills:\n${values.skills}`;
+  if (values.educations && values.educations.length > 0 && values.educations[0].degree) {
+    resume += "\nEducation:\n";
+    values.educations.forEach(edu => {
+      resume += `- ${edu.degree}, ${edu.school} (${edu.year})`;
+      if (edu.percentage) {
+        resume += ` - ${edu.percentage}`;
+      }
+      resume += '\n';
+    });
+  }
+
+  if(values.skills) resume += `\nSkills:\n${values.skills}`;
   return resume;
 }
 
@@ -128,28 +135,37 @@ export default function Home() {
   });
 
   const loadDataForUser = useCallback(async (userId: string, userEmail: string) => {
-    setIsFormLoading(true);
-    const { success, data } = await fetchResumeData(userId);
+    const { success, data, error } = await fetchResumeData(userId);
     if (success && data) {
-      form.reset(data);
+      form.reset({ ...data, email: userEmail }); // ensure email is up-to-date
       toast({
         title: "Welcome Back!",
         description: "Your saved resume data has been loaded.",
       });
     } else {
-        // Set email for new users
+        // Set email for new users or if data fetch fails
+        form.reset();
         form.setValue('email', userEmail);
+        if(error) {
+          toast({
+            variant: "destructive",
+            title: "Could not load data",
+            description: error,
+          });
+        }
     }
     setIsFormLoading(false);
   }, [form, toast]);
 
 
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!authLoading) {
+      if (user) {
         loadDataForUser(user.uid, user.email!);
-    } else if (!authLoading && !user) {
+      } else {
         // Not logged in, stop loading
         setIsFormLoading(false);
+      }
     }
   }, [user, authLoading, loadDataForUser]);
 
@@ -182,10 +198,21 @@ export default function Home() {
     setResult(null);
 
     const resume = assembleResume(values);
+    if (!resume.trim() && !values.jobDescription?.trim()) {
+       toast({
+        variant: "destructive",
+        title: "Incomplete Information",
+        description: "Please fill out at least one section of your resume or provide a job description.",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+
     const response = await handleCustomizeResumeAction(
       {
         resume: resume, 
-        jobDescription: values.jobDescription,
+        jobDescription: values.jobDescription || "",
         photoDataUri: values.photo,
       },
       values,

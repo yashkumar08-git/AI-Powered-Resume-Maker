@@ -15,7 +15,7 @@ const formSchema = z.object({
 const formValuesSchema = z.object({
   name: z.string().optional(),
   professionalTitle: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address." }),
+  email: z.string().email({ message: "Invalid email address." }).optional(),
   phone: z.string().optional(),
   linkedin: z.string().optional(),
   location: z.string().optional(),
@@ -32,8 +32,8 @@ const formValuesSchema = z.object({
     year: z.string(),
     percentage: z.string().optional(),
   })),
-  skills: z.string(),
-  jobDescription: z.string(),
+  skills: z.string().optional(),
+  jobDescription: z.string().optional(),
   photo: z.string().optional(),
 });
 
@@ -82,8 +82,8 @@ export async function fetchResumeData(userId: string) {
   try {
     const data = await getResumeData(userId);
     return { success: true, data };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch resume data:", error);
-    return { success: false, error: "Could not load your saved data." };
+    return { success: false, error: error.message || "Could not load your saved data." };
   }
 }
