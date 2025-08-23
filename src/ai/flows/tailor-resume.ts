@@ -56,20 +56,17 @@ export async function customizeResume(input: CustomizeResumeInput): Promise<Cust
   return customizeResumeFlow(input);
 }
 
-const resumeOnlyPrompt = ai.definePrompt({
-    name: 'resumeOnlyPrompt',
+const resumePrompt = ai.definePrompt({
+    name: 'resumePrompt',
     input: {schema: CustomizeResumeInputSchema},
     output: {schema: ResumeSchema},
-    config: {
-      responseFormat: 'json',
-    },
     prompt: `You are an expert resume writer. Your task is to generate a resume based on the provided information.
+
+Your output MUST be a JSON object that conforms to the provided JSON schema. Do not add any extra text or markdown formatting around the JSON object.
 
 If the user provides a resume and/or a job description, you will customize the resume to the job description, highlighting relevant skills and experience.
 
 If the user provides an empty resume and an empty job description, you MUST generate a high-quality, complete sample resume for a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
-
-Structure the output as a JSON object that conforms to the provided schema.
 
 If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object.
 
@@ -85,10 +82,10 @@ Photo:
 `,
 });
 
-const coverLetterOnlyPrompt = ai.definePrompt({
-    name: 'coverLetterOnlyPrompt',
+const coverLetterPrompt = ai.definePrompt({
+    name: 'coverLetterPrompt',
     input: {schema: z.object({
-      resume: z.string(),
+      resumeJson: z.string(), // Expecting the resume as a JSON string
       jobDescription: z.string(),
     })},
     output: {schema: z.string()},
@@ -98,8 +95,10 @@ If the user provides a resume and/or a job description, you will write a cover l
 
 If the user provides an empty resume and an empty job description, you MUST generate a high-quality sample cover letter from a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
 
+The user's resume is provided below as a JSON object. Use this as the primary source of information.
+
 Resume:
-{{{resume}}}
+{{{resumeJson}}}
 
 Job Description:
 {{{jobDescription}}}
@@ -114,23 +113,34 @@ const customizeResumeFlow = ai.defineFlow(
     outputSchema: CustomizeResumeOutputSchema,
   },
   async (input) => {
-    const [resumeResult, coverLetterResult] = await Promise.all([
-      resumeOnlyPrompt(input),
-      coverLetterOnlyPrompt({
-        resume: input.resume,
-        jobDescription: input.jobDescription,
-      }),
-    ]);
+    // Step 1: Generate the customized resume.
+    const resumeResult = await resumePrompt(input);
+    const customizedResume = resumeResult.output;
+
+    if (!customizedResume) {
+        throw new Error("Failed to generate the resume.");
+    }
     
-    const customizedResume = resumeResult.output!;
     // Ensure photo is passed through if the model misses it.
     if (input.photoDataUri && !customizedResume.photoDataUri) {
       customizedResume.photoDataUri = input.photoDataUri;
     }
+
+    // Step 2: Generate the cover letter using the generated resume data.
+    const coverLetterResult = await coverLetterPrompt({
+        // Pass the generated resume as a JSON string to the next prompt
+        resumeJson: JSON.stringify(customizedResume, null, 2),
+        jobDescription: input.jobDescription
+    });
+
+    const coverLetter = coverLetterResult.output;
+    if (!coverLetter) {
+        throw new Error("Failed to generate the cover letter.");
+    }
     
     return {
       customizedResume: customizedResume,
-      coverLetter: coverLetterResult.output!,
+      coverLetter: coverLetter,
     };
   }
 );

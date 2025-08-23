@@ -11,8 +11,8 @@ const formSchema = z.object({
 });
 
 type ActionResponse = 
-  | { success: true; data: CustomizeResumeOutput }
-  | { success: false; error: string };
+  | { success: true, data: CustomizeResumeOutput }
+  | { success: false, error: string };
 
 export async function handleCustomizeResumeAction(
   formData: { resume?: string; jobDescription?: string; photoDataUri?: string },
@@ -28,9 +28,10 @@ export async function handleCustomizeResumeAction(
     const result = await customizeResume(validation.data);
     
     return { success: true, data: result };
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
-    // This provides a generic error message to the user for security.
-    return { success: false, error: "Failed to generate documents. Please try again later." };
+    // Provide a more specific error message to the user.
+    const errorMessage = e.message || "An unexpected error occurred. Please try again later.";
+    return { success: false, error: `Failed to generate documents: ${errorMessage}` };
   }
 }
