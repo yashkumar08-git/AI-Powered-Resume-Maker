@@ -109,8 +109,13 @@ const customizeResumeFlow = ai.defineFlow(
       }),
     ]);
     
+    const customizedResume = resumeResult.output!;
+    if (input.photoDataUri && !customizedResume.photoDataUri) {
+      customizedResume.photoDataUri = input.photoDataUri;
+    }
+    
     return {
-      customizedResume: resumeResult.output!,
+      customizedResume: customizedResume,
       coverLetter: coverLetterResult.output!,
     };
   }
