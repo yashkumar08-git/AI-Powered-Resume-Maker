@@ -2,12 +2,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { handleCustomizeResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,9 +34,7 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { LoadingState } from "@/components/LoadingState";
-import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon } from "lucide-react";
+import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader } from "lucide-react";
 import Image from "next/image";
 
 const experienceSchema = z.object({
@@ -104,7 +102,7 @@ function assembleResume(values: FormValues): string {
 }
 
 export default function Home() {
-  const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -153,7 +151,6 @@ export default function Home() {
 
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
-    setResult(null);
 
     const resume = assembleResume(values);
     
@@ -167,11 +164,14 @@ export default function Home() {
 
     setIsLoading(false);
     if (response.success && response.data) {
-      setResult(response.data);
       toast({
         title: "Success!",
         description: "Your customized documents have been generated.",
       });
+      // Store result in session storage and navigate
+      sessionStorage.setItem("resumeResult", JSON.stringify(response.data));
+      router.push("/results");
+
     } else {
       toast({
         variant: "destructive",
@@ -181,26 +181,6 @@ export default function Home() {
       });
     }
   };
-
-  const handleCreateNew = () => {
-    setResult(null);
-    form.reset({
-      name: "",
-      professionalTitle: "",
-      email: "",
-      phone: "",
-      linkedin: "",
-      location: "",
-      website: "",
-      experiences: [{ title: "", company: "", dates: "", description: "" }],
-      educations: [{ degree: "", school: "", year: "", percentage: "" }],
-      skills: "",
-      jobDescription: "",
-      photo: "",
-    });
-    setPhotoPreview(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
@@ -508,17 +488,18 @@ export default function Home() {
                 </AccordionItem>
               </Accordion>
               <Button type="submit" size="lg" className="w-full text-lg" disabled={isLoading}>
-                {isLoading ? 'Generating...' : 'Craft My Resume'}
+                {isLoading ? (
+                  <>
+                    <Loader className="mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : 'Craft My Resume'}
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
 
-      <div className="mt-8">
-        {isLoading && <LoadingState />}
-        {result && <ResultsDisplay result={result} onStartOver={handleCreateNew} />}
-      </div>
     </div>
   );
 }
