@@ -58,26 +58,38 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   };
 
   const downloadPdf = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
-    if (ref.current) {
-      html2canvas(ref.current, { scale: 2, backgroundColor: '#ffffff' }).then((canvas) => {
+    const element = ref.current;
+    if (element) {
+      html2canvas(element, { 
+        scale: 2, 
+        backgroundColor: '#ffffff',
+        // These options help render the full content, not just the visible part
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+       }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
+        
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const ratio = canvasHeight / canvasWidth;
-        let heightLeft = canvasHeight;
+        const ratio = canvasWidth / canvasHeight;
+        
+        const imgHeight = pdfWidth / ratio;
+        let heightLeft = imgHeight;
 
         let position = 0;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfWidth * ratio);
+
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
         heightLeft -= pdfHeight;
 
         while (heightLeft > 0) {
-          position = heightLeft - canvasHeight;
+          position = position - pdfHeight;
           pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfWidth * ratio);
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
           heightLeft -= pdfHeight;
         }
 
@@ -87,8 +99,16 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   };
 
   const downloadImage = (ref: React.RefObject<HTMLDivElement>, filename: string) => {
-    if (ref.current) {
-      html2canvas(ref.current, { scale: 2, backgroundColor: '#ffffff' }).then((canvas) => {
+    const element = ref.current;
+    if (element) {
+      html2canvas(element, { 
+        scale: 2, 
+        backgroundColor: '#ffffff',
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+       }).then((canvas) => {
         const link = document.createElement('a');
         link.download = filename;
         link.href = canvas.toDataURL('image/png');
