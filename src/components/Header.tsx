@@ -78,10 +78,6 @@ export function Header() {
                         Profile
                     </Link>
                   </DropdownMenuItem>
-                   <DropdownMenuItem>
-                    <LayoutGrid className="mr-2 h-4 w-4"/>
-                    Dashboard
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                      <LogOut className="mr-2 h-4 w-4" />
