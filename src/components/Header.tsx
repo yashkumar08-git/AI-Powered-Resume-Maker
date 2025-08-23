@@ -10,6 +10,7 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Menu, LogOut, LogIn, UserPlus } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
@@ -86,12 +87,16 @@ export function Header() {
                     </>
                   ) : (
                     <>
-                       <Button variant="ghost" asChild className="w-full">
-                          <Link href="/login"><LogIn/>Login</Link>
-                        </Button>
-                        <Button variant="default" asChild className="w-full">
-                          <Link href="/signup"><UserPlus/>Sign Up</Link>
-                        </Button>
+                       <SheetClose asChild>
+                          <Button variant="ghost" asChild className="w-full">
+                            <Link href="/login"><LogIn/>Login</Link>
+                          </Button>
+                       </SheetClose>
+                        <SheetClose asChild>
+                          <Button variant="default" asChild className="w-full">
+                            <Link href="/signup"><UserPlus/>Sign Up</Link>
+                          </Button>
+                        </SheetClose>
                     </>
                   )}
               </div>
