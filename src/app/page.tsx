@@ -55,7 +55,7 @@ const educationSchema = z.object({
 const formSchema = z.object({
   name: z.string().optional(),
   professionalTitle: z.string().optional(),
-  email: z.string().email({ message: "Invalid email address." }).optional().or(z.literal('')),
+  email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
   phone: z.string().optional(),
   linkedin: z.string().optional(),
   location: z.string().optional(),
@@ -510,7 +510,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-
-    
