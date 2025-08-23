@@ -73,10 +73,9 @@ type FormValues = z.infer<typeof formSchema>;
 function assembleResume(values: FormValues): string {
   let resume = `Name: ${values.name}\n`;
   if(values.professionalTitle) resume += `Professional Title: ${values.professionalTitle}\n`;
-  resume += `Contact:\n`;
-  resume += `- Email: ${values.email}\n`;
-  if(values.phone) resume += `- Phone: ${values.phone}\n`;
-  if(values.linkedin) resume += `- LinkedIn: ${values.linkedin}\n`;
+  resume += `Email: ${values.email}\n`;
+  if(values.phone) resume += `Phone: ${values.phone}\n`;
+  if(values.linkedin) resume += `LinkedIn: ${values.linkedin}\n`;
 
   if(values.location) resume += `Location: ${values.location}\n`;
   if(values.website) resume += `Website: ${values.website}\n\n`;
@@ -173,6 +172,12 @@ export default function Home() {
       });
     }
   };
+
+  const handleCreateNew = () => {
+    setResult(null);
+    form.reset();
+    setPhotoPreview(null);
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
@@ -492,7 +497,7 @@ export default function Home() {
 
 
       {isLoading && <LoadingState />}
-      {result && <ResultsDisplay result={result} />}
+      {result && <ResultsDisplay result={result} onStartOver={handleCreateNew} />}
     </div>
   );
 }

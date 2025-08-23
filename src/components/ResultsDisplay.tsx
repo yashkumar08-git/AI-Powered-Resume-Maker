@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin } from "lucide-react";
+import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -26,9 +26,10 @@ import { cn } from "@/lib/utils";
 
 interface ResultsDisplayProps {
   result: CustomizeResumeOutput;
+  onStartOver: () => void;
 }
 
-export function ResultsDisplay({ result }: ResultsDisplayProps) {
+export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const { toast } = useToast();
   const resumeRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
@@ -187,6 +188,10 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </div>
          
           <div className="flex items-center gap-4 flex-wrap justify-start">
+             <Button onClick={onStartOver} variant="outline">
+                <FilePlus2 className="mr-2 h-4 w-4" />
+                Create New Resume
+            </Button>
             <TemplateSwitcher
                 activeTemplate={activeTemplate}
                 onTemplateChange={setActiveTemplate}
@@ -311,5 +316,3 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     </div>
   );
 }
-
-    
