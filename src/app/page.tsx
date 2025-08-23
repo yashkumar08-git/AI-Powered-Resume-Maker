@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -36,6 +35,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader } from "lucide-react";
 import Image from "next/image";
+import { ResultsDisplay } from "@/components/ResultsDisplay";
+import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
 
 const experienceSchema = z.object({
   title: z.string(),
@@ -102,8 +103,8 @@ function assembleResume(values: FormValues): string {
 }
 
 export default function Home() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<CustomizeResumeOutput | null>(null);
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -151,6 +152,7 @@ export default function Home() {
 
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
+    setResult(null);
 
     const resume = assembleResume(values);
     
@@ -168,10 +170,7 @@ export default function Home() {
         title: "Success!",
         description: "Your customized documents have been generated.",
       });
-      // Store result in session storage and navigate
-      sessionStorage.setItem("resumeResult", JSON.stringify(response.data));
-      router.push("/results");
-
+      setResult(response.data);
     } else {
       toast({
         variant: "destructive",
@@ -499,7 +498,15 @@ export default function Home() {
           </Form>
         </CardContent>
       </Card>
+      
+      {result && (
+        <div className="mt-16">
+          <ResultsDisplay result={result} onStartOver={() => setResult(null)} />
+        </div>
+      )}
 
     </div>
   );
 }
+
+    

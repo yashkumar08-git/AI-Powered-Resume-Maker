@@ -3,7 +3,6 @@
 
 import { Wand2 } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export function Header() {
   
@@ -16,15 +15,9 @@ export function Header() {
           </div>
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
-        <div className="flex items-center gap-2">
-            <Link href="/login" passHref>
-                <Button variant="outline">Login</Button>
-            </Link>
-            <Link href="/signup" passHref>
-                <Button>Sign Up</Button>
-            </Link>
-        </div>
       </div>
     </header>
   );
 }
+
+    
