@@ -8,6 +8,8 @@ import * as z from "zod";
 import { handleCustomizeResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +40,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const experienceSchema = z.object({
   title: z.string(),
@@ -103,6 +106,9 @@ export default function Home() {
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -120,6 +126,15 @@ export default function Home() {
       photo: "",
     },
   });
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+    if(user && user.email) {
+      form.setValue('email', user.email);
+    }
+  }, [user, authLoading, router, form]);
 
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
@@ -176,8 +191,34 @@ export default function Home() {
   const handleCreateNew = () => {
     setResult(null);
     form.reset();
+    if(user && user.email) {
+      form.setValue('email', user.email);
+    }
     setPhotoPreview(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  if (authLoading || !user) {
+    return (
+       <div className="container mx-auto px-4 py-8 md:py-16">
+         <div className="text-center max-w-3xl mx-auto animate-fade-in-up mb-8">
+            <Skeleton className="h-16 w-3/4 mx-auto" />
+            <Skeleton className="h-6 w-full mt-4 mx-auto" />
+         </div>
+         <Card className="mt-8 md:mt-12 max-w-4xl mx-auto">
+            <CardHeader>
+              <Skeleton className="h-8 w-1/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+         </Card>
+       </div>
+    );
   }
 
   return (
@@ -207,7 +248,7 @@ export default function Home() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-                 <Accordion type="multiple" className="w-full" defaultValue={["item-1", "item-2", "item-3", "item-4", "item-5"]}>
+                 <Accordion type="multiple" className="w-full">
                   <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
                     <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
@@ -502,5 +543,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

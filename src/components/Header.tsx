@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { Skeleton } from './ui/skeleton';
 
 export function Header() {
   const { user, signOut, loading } = useAuth();
@@ -26,8 +27,11 @@ export function Header() {
     <div className="flex flex-col md:flex-row items-center gap-2 w-full">
       {loading ? (
         <>
-          <div className="hidden sm:block h-6 w-32 bg-muted rounded-md animate-pulse" />
-          <div className="h-10 w-20 bg-muted rounded-md animate-pulse" />
+          <div className="hidden sm:block">
+            <Skeleton className="h-6 w-32" />
+          </div>
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-10 w-24" />
         </>
       ) : user ? (
         <>

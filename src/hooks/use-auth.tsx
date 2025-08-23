@@ -56,25 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = () => {
     return firebaseSignOut(auth);
   };
-  
-  if (loading) {
-    return (
-      <div className="flex flex-col h-screen">
-        <header className="py-4 px-4 sm:px-6 lg:px-8 border-b">
-          <div className="container mx-auto flex items-center justify-between">
-            <Skeleton className="h-8 w-48" />
-            <div className="flex gap-2">
-              <Skeleton className="h-10 w-20" />
-              <Skeleton className="h-10 w-20" />
-            </div>
-          </div>
-        </header>
-        <main className="flex-grow container mx-auto p-4">
-          <Skeleton className="h-full w-full" />
-        </main>
-      </div>
-    );
-  }
 
   return (
     <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
