@@ -58,7 +58,7 @@ export async function customizeResume(input: CustomizeResumeInput): Promise<Cust
 
 const resumePrompt = ai.definePrompt({
     name: 'resumePrompt',
-    model: 'googleai/gemini-1.5-flash-latest',
+    model: 'googleai/gemini-1.5-pro-latest',
     input: {schema: CustomizeResumeInputSchema},
     output: {schema: ResumeSchema},
     prompt: `You are an expert resume writer. Your task is to generate a resume based on the provided information.
@@ -85,7 +85,7 @@ Photo:
 
 const coverLetterPrompt = ai.definePrompt({
     name: 'coverLetterPrompt',
-    model: 'googleai/gemini-1.5-flash-latest',
+    model: 'googleai/gemini-1.5-pro-latest',
     input: {schema: z.object({
       resumeJson: z.string(), // Expecting the resume as a JSON string
       jobDescription: z.string().optional().default(''),
