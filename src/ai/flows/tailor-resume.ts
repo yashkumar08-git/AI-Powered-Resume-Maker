@@ -56,11 +56,11 @@ export async function customizeResume(input: CustomizeResumeInput): Promise<Cust
   return customizeResumeFlow(input);
 }
 
-const customizeResumePrompt = ai.definePrompt({
-  name: 'customizeResumePrompt',
-  input: {schema: CustomizeResumeInputSchema},
-  output: {schema: CustomizeResumeOutputSchema},
-  prompt: `You are an expert resume writer and career advisor. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. Structure the output as a JSON object that conforms to the provided schema. You will also write a compelling cover letter for the job.
+const resumeOnlyPrompt = ai.definePrompt({
+    name: 'resumeOnlyPrompt',
+    input: {schema: CustomizeResumeInputSchema},
+    output: {schema: ResumeSchema},
+    prompt: `You are an expert resume writer. You will customize the user's resume to the job description provided, highlighting relevant skills and experience. Structure the output as a JSON object that conforms to the provided schema.
 
 If a photo is provided, include the photo's data URI in the 'photoDataUri' field of the resume object. Otherwise, leave it null.
 
@@ -76,6 +76,21 @@ Photo:
 `,
 });
 
+const coverLetterOnlyPrompt = ai.definePrompt({
+    name: 'coverLetterOnlyPrompt',
+    input: {schema: CustomizeResumeInputSchema},
+    output: {schema: z.string()},
+    prompt: `You are an expert career advisor. Based on the provided resume and job description, write a compelling and professional cover letter.
+
+Resume:
+{{{resume}}}
+
+Job Description:
+{{{jobDescription}}}
+`,
+});
+
+
 const customizeResumeFlow = ai.defineFlow(
   {
     name: 'customizeResumeFlow',
@@ -83,11 +98,19 @@ const customizeResumeFlow = ai.defineFlow(
     outputSchema: CustomizeResumeOutputSchema,
   },
   async input => {
-    const {output} = await customizeResumePrompt(input);
-    if (output) {
-      // Ensure photoDataUri is passed through if it exists
-      output.customizedResume.photoDataUri = input.photoDataUri;
+    const [resumeResult, coverLetterResult] = await Promise.all([
+        resumeOnlyPrompt(input),
+        coverLetterOnlyPrompt(input),
+    ]);
+    
+    const customizedResume = resumeResult.output!;
+    if (input.photoDataUri) {
+        customizedResume.photoDataUri = input.photoDataUri;
     }
-    return output!;
+
+    return {
+        customizedResume,
+        coverLetter: coverLetterResult.output!,
+    };
   }
 );
