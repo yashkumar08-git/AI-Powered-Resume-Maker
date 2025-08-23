@@ -12,20 +12,29 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader, FileText, ArrowLeft, Pencil } from "lucide-react";
+import { Loader, FileText, ArrowLeft, Pencil, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getSavedResumesAction } from "@/app/actions";
+import { getSavedResumesAction, getResumeWithPhotoAction } from "@/app/actions";
 import { TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
-type SavedResume = TailorResumeOutput & { id: string, createdAt: { seconds: number, nanoseconds: number }, resumeName?: string, professionalTitle?: string };
+type SavedResume = Omit<TailorResumeOutput, 'customizedResume'> & { 
+  id: string, 
+  createdAt: { seconds: number, nanoseconds: number }, 
+  resumeName?: string, 
+  professionalTitle?: string,
+  customizedResume: Omit<TailorResumeOutput['customizedResume'], 'photoDataUri'> & { photoDataUri?: string }
+};
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [resumes, setResumes] = useState<SavedResume[]>([]);
   const [loadingResumes, setLoadingResumes] = useState(true);
+  const [isFetchingDetails, setIsFetchingDetails] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -39,7 +48,6 @@ export default function ProfilePage() {
         setLoadingResumes(true);
         const result = await getSavedResumesAction(user.uid);
         if (result.success && result.data) {
-          // Sort resumes by creation date, newest first
           const sortedResumes = result.data.sort((a, b) => {
             const dateA = a.createdAt?.seconds || 0;
             const dateB = b.createdAt?.seconds || 0;
@@ -52,15 +60,38 @@ export default function ProfilePage() {
       fetchResumes();
     }
   }, [user]);
+  
+  const fetchResumeDetails = async (resumeId: string) => {
+    setIsFetchingDetails(resumeId);
+    const result = await getResumeWithPhotoAction(resumeId);
+    setIsFetchingDetails(null);
 
-  const handleViewResume = (resume: SavedResume) => {
-    localStorage.setItem('resumeResult', JSON.stringify(resume));
-    router.push('/results');
+    if (result.success && result.data) {
+      return result.data;
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: result.error || "Could not load resume details.",
+      });
+      return null;
+    }
+  };
+
+  const handleViewResume = async (resume: SavedResume) => {
+    const fullResume = await fetchResumeDetails(resume.id);
+    if (fullResume) {
+      localStorage.setItem('resumeResult', JSON.stringify(fullResume));
+      router.push('/results');
+    }
   }
 
-  const handleEditResume = (resume: SavedResume) => {
-    localStorage.setItem('resumeToEdit', JSON.stringify(resume));
-    router.push('/');
+  const handleEditResume = async (resume: SavedResume) => {
+    const fullResume = await fetchResumeDetails(resume.id);
+    if (fullResume) {
+      localStorage.setItem('resumeToEdit', JSON.stringify(fullResume));
+      router.push('/');
+    }
   }
 
   const getInitials = (email: string | null | undefined) => {
@@ -115,13 +146,12 @@ export default function ProfilePage() {
                 {resumes.map((resume, index) => (
                   <div 
                     key={resume.id} 
-                    className="flex items-center justify-between p-3 rounded-md transition-all duration-300 ease-in-out hover:bg-accent hover:shadow-md hover:scale-[1.02] cursor-pointer animate-fade-in-up"
+                    className="flex items-center justify-between p-3 rounded-md transition-all duration-300 ease-in-out hover:bg-accent hover:shadow-md hover:scale-[1.02] animate-fade-in-up"
                     style={{ animationDelay: `${0.3 + index * 0.1}s` }}
-                    onClick={() => handleViewResume(resume)}
                     >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4" onClick={() => handleViewResume(resume)}>
                        <FileText className="text-primary h-6 w-6" />
-                       <div>
+                       <div className="cursor-pointer">
                           <p className="font-semibold">{resume.resumeName || resume.professionalTitle || 'Resume'}</p>
                           <p className="text-sm text-muted-foreground">
                             Created {resume.createdAt ? formatDistanceToNow(new Date(resume.createdAt.seconds * 1000), { addSuffix: true }) : 'recently'}
@@ -129,11 +159,14 @@ export default function ProfilePage() {
                        </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleEditResume(resume); }}>
-                        <Pencil className="mr-2 h-3 w-3" />
+                      <Button variant="outline" size="sm" onClick={() => handleEditResume(resume)} disabled={isFetchingDetails === resume.id}>
+                         {isFetchingDetails === resume.id ? <Loader className="animate-spin" /> : <Pencil className="mr-2 h-3 w-3" />}
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewResume(resume); }}>View</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleViewResume(resume)} disabled={isFetchingDetails === resume.id}>
+                         {isFetchingDetails === resume.id ? <Loader className="animate-spin" /> : <Eye className="mr-2 h-3 w-3" />}
+                        View
+                      </Button>
                     </div>
                   </div>
                 ))}

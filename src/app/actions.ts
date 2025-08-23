@@ -4,7 +4,7 @@
 import { tailorResume, TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { z } from "zod";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, doc, setDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, serverTimestamp, query, where, getDocs, getDoc, writeBatch } from "firebase/firestore";
 
 
 const formSchema = z.object({
@@ -34,6 +34,11 @@ export async function handleTailorResumeAction(
       photoDataUri: validation.data.photoDataUri,
     });
     
+    // Pass photo through if AI misses it.
+    if (validation.data.photoDataUri) {
+      result.customizedResume.photoDataUri = validation.data.photoDataUri;
+    }
+    
     return { success: true, data: result };
   } catch (e: any) {
     console.error(e);
@@ -54,24 +59,42 @@ export async function saveResumeAction(
   }
 
   try {
+    // Separate photo data
+    const photoDataUri = resumeData.customizedResume.photoDataUri;
+    const resumeToSave = { ...resumeData };
+    // @ts-ignore
+    delete resumeToSave.customizedResume.photoDataUri;
+
     const dataToSave = {
       userId,
-      resumeName, // Save the custom name
-      professionalTitle: resumeData.customizedResume.professionalTitle, // Save title for fallback
-      ...resumeData,
+      resumeName,
+      professionalTitle: resumeToSave.customizedResume.professionalTitle,
+      ...resumeToSave,
       createdAt: serverTimestamp(),
     };
 
+    const batch = writeBatch(db);
+    let newResumeId = resumeId;
+
     if (resumeId) {
       // Update existing document
-      const docRef = doc(db, "resumes", resumeId);
-      await setDoc(docRef, dataToSave, { merge: true });
-      return { success: true, id: resumeId };
+      const resumeRef = doc(db, "resumes", resumeId);
+      batch.set(resumeRef, dataToSave, { merge: true });
     } else {
       // Create new document
-      const docRef = await addDoc(collection(db, "resumes"), dataToSave);
-      return { success: true, id: docRef.id };
+      const resumeRef = doc(collection(db, "resumes"));
+      batch.set(resumeRef, dataToSave);
+      newResumeId = resumeRef.id;
     }
+
+    if (photoDataUri && newResumeId) {
+      const photoRef = doc(db, "resumes_photos", newResumeId);
+      batch.set(photoRef, { photoDataUri });
+    }
+
+    await batch.commit();
+
+    return { success: true, id: newResumeId };
 
   } catch (error: any) {
     console.error("Error saving resume to Firestore:", error);
@@ -98,4 +121,34 @@ export async function getSavedResumesAction(
   } catch (error: any) {
     return { success: false, error: error.message };
   }
+}
+
+
+export async function getResumeWithPhotoAction(resumeId: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    if (!resumeId) {
+        return { success: false, error: "Resume ID is required." };
+    }
+    try {
+        const resumeRef = doc(db, "resumes", resumeId);
+        const resumeSnap = await getDoc(resumeRef);
+
+        if (!resumeSnap.exists()) {
+            return { success: false, error: "Resume not found." };
+        }
+
+        const resumeData = { id: resumeSnap.id, ...resumeSnap.data() };
+
+        const photoRef = doc(db, "resumes_photos", resumeId);
+        const photoSnap = await getDoc(photoRef);
+
+        if (photoSnap.exists()) {
+            // @ts-ignore
+            resumeData.customizedResume.photoDataUri = photoSnap.data().photoDataUri;
+        }
+
+        return { success: true, data: resumeData };
+    } catch (error: any) {
+        console.error("Error fetching resume with photo:", error);
+        return { success: false, error: error.message || "Failed to fetch resume details." };
+    }
 }

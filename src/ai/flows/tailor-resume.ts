@@ -74,7 +74,7 @@ If the user provides a resume and/or a job description, you will customize the r
 
 If the user provides an empty resume and an empty job description, you MUST generate a high-quality, complete sample resume AND a sample cover letter for a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
 
-If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object.
+If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object. Do not process or change the photo data URI.
 
 Resume:
 {{{resume}}}
@@ -95,11 +95,26 @@ const tailorResumeFlow = ai.defineFlow(
     outputSchema: TailorResumeOutputSchema,
   },
   async (input) => {
-    const result = await tailorResumePrompt(input);
+    // To optimize, don't pass the full photo data to the model if it's very large.
+    // The prompt instructs the model to just pass it through, so we can handle it here.
+    const { photoDataUri, ...restOfInput } = input;
+    let promptInput = { ...restOfInput } as TailorResumeInput;
+    // A simplified placeholder to indicate a photo exists without sending the whole thing.
+    if (photoDataUri) {
+      promptInput.photoDataUri = 'photo-provided-in-input';
+    }
+
+    const result = await tailorResumePrompt(promptInput);
     const output = result.output;
     if (!output) {
       throw new Error("Failed to generate the resume and cover letter.");
     }
+    
+    // Restore the original photo URI in the final output
+    if (photoDataUri) {
+      output.customizedResume.photoDataUri = photoDataUri;
+    }
+    
     return output;
   }
 );
