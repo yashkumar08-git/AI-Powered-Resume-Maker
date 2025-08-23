@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -43,11 +44,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = (email: string, pass: string) => {
-    return createUserWithEmailAndPassword(auth, email, pass);
+    setLoading(true);
+    return createUserWithEmailAndPassword(auth, email, pass).finally(() => setLoading(false));
   };
 
   const signIn = (email: string, pass: string) => {
-    return signInWithEmailAndPassword(auth, email, pass);
+    setLoading(true);
+    return signInWithEmailAndPassword(auth, email, pass).finally(() => setLoading(false));
   };
 
   const signOut = () => {

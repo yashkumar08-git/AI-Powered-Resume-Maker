@@ -11,35 +11,43 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from 'lucide-react';
+import { Menu, LogOut, LogIn, UserPlus } from 'lucide-react';
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const router = useRouter();
 
   const handleSignOut = async () => {
     await signOut();
-    router.push('/');
+    router.push('/login');
   };
 
   const navLinks = (
-    <>
-      {user ? (
+    <div className="flex flex-col md:flex-row items-center gap-2 w-full">
+      {loading ? (
+        <>
+          <div className="hidden sm:block h-6 w-32 bg-muted rounded-md animate-pulse" />
+          <div className="h-10 w-20 bg-muted rounded-md animate-pulse" />
+        </>
+      ) : user ? (
         <>
           <p className="text-sm text-muted-foreground hidden sm:block">Welcome, {user.email}</p>
-          <Button variant="ghost" onClick={handleSignOut}>Logout</Button>
+          <Button variant="ghost" onClick={handleSignOut} className="w-full md:w-auto">
+            <LogOut />
+            Logout
+          </Button>
         </>
       ) : (
         <>
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
+          <Button variant="ghost" asChild className="w-full md:w-auto">
+            <Link href="/login"><LogIn/>Login</Link>
           </Button>
-          <Button variant="default" asChild>
-            <Link href="/signup">Sign Up</Link>
+          <Button variant="default" asChild className="w-full md:w-auto">
+            <Link href="/signup"><UserPlus/>Sign Up</Link>
           </Button>
         </>
       )}
-    </>
+    </div>
   );
 
   return (
@@ -62,7 +70,7 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent>
-              <div className="flex flex-col items-center justify-center h-full gap-4">
+              <div className="flex flex-col items-center justify-center h-full gap-4 p-4">
                 {navLinks}
               </div>
             </SheetContent>
