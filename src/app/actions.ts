@@ -4,7 +4,7 @@
 import { tailorResume, TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { z } from "zod";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 
 
 const formSchema = z.object({
@@ -14,7 +14,7 @@ const formSchema = z.object({
 });
 
 type ActionResponse = 
-  | { success: true, data: TailorResumeOutput }
+  | { success: true, data: TailorResumeOutput & { id?: string } }
   | { success: false, error: string };
 
 export async function handleTailorResumeAction(
@@ -47,25 +47,38 @@ export async function saveResumeAction(
   resumeData: TailorResumeOutput,
   userId: string,
   resumeName: string,
+  resumeId?: string,
 ): Promise<{ success: boolean, error?: string, id?: string }> {
   if (!userId) {
     return { success: false, error: "User must be logged in to save." };
   }
 
   try {
-    const docRef = await addDoc(collection(db, "resumes"), {
+    const dataToSave = {
       userId,
       resumeName, // Save the custom name
       professionalTitle: resumeData.customizedResume.professionalTitle, // Save title for fallback
       ...resumeData,
       createdAt: serverTimestamp(),
-    });
-    return { success: true, id: docRef.id };
+    };
+
+    if (resumeId) {
+      // Update existing document
+      const docRef = doc(db, "resumes", resumeId);
+      await setDoc(docRef, dataToSave, { merge: true });
+      return { success: true, id: resumeId };
+    } else {
+      // Create new document
+      const docRef = await addDoc(collection(db, "resumes"), dataToSave);
+      return { success: true, id: docRef.id };
+    }
+
   } catch (error: any) {
     console.error("Error saving resume to Firestore:", error);
     return { success: false, error: error.message || "Failed to save resume." };
   }
 }
+
 
 export async function getSavedResumesAction(
   userId: string

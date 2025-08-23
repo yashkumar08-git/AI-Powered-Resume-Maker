@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { TailorResumeOutput } from "@/ai/flows/tailor-resume";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +41,7 @@ import { saveResumeAction } from "@/app/actions";
 
 
 interface ResultsDisplayProps {
-  result: TailorResumeOutput;
+  result: TailorResumeOutput & { id?: string };
   onStartOver: () => void;
 }
 
@@ -56,6 +56,14 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const [resumeName, setResumeName] = useState("");
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
+  useEffect(() => {
+    // Pre-fill save dialog with existing name if editing
+    // @ts-ignore
+    if (result.resumeName) {
+      // @ts-ignore
+      setResumeName(result.resumeName);
+    }
+  }, [result]);
 
   const downloadTextFile = (content: string, filename: string) => {
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -171,12 +179,12 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
     }
 
     setIsSaving(true);
-    const response = await saveResumeAction(result, user.uid, resumeName);
+    const response = await saveResumeAction(result, user.uid, resumeName, result.id);
     setIsSaving(false);
 
     if (response.success) {
       setIsSaveDialogOpen(false);
-      setResumeName("");
+      // Don't clear resumeName if we want it to persist for next save
       toast({
         title: "Resume Saved!",
         description: "Your resume has been successfully saved to your profile.",
@@ -418,5 +426,3 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
       </Tabs>
     </div>
   );
-
-    

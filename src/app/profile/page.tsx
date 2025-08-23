@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader, FileText, ArrowLeft } from "lucide-react";
+import { Loader, FileText, ArrowLeft, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSavedResumesAction } from "@/app/actions";
 import { TailorResumeOutput } from "@/ai/flows/tailor-resume";
@@ -56,6 +56,11 @@ export default function ProfilePage() {
   const handleViewResume = (resume: SavedResume) => {
     localStorage.setItem('resumeResult', JSON.stringify(resume));
     router.push('/results');
+  }
+
+  const handleEditResume = (resume: SavedResume) => {
+    localStorage.setItem('resumeToEdit', JSON.stringify(resume));
+    router.push('/');
   }
 
   const getInitials = (email: string | null | undefined) => {
@@ -118,7 +123,13 @@ export default function ProfilePage() {
                           </p>
                        </div>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => handleViewResume(resume)}>View</Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEditResume(resume)}>
+                        <Pencil className="mr-2 h-3 w-3" />
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleViewResume(resume)}>View</Button>
+                    </div>
                   </div>
                 ))}
               </div>

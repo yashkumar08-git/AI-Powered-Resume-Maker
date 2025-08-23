@@ -8,7 +8,7 @@ import type { TailorResumeOutput } from '@/ai/flows/tailor-resume';
 import { LoadingState } from '@/components/LoadingState';
 
 export default function ResultsPage() {
-  const [result, setResult] = useState<TailorResumeOutput | null>(null);
+  const [result, setResult] = useState<(TailorResumeOutput & { id?: string }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 

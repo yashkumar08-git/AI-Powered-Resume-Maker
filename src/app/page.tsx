@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader } from "lucide-react";
 import Image from "next/image";
+import type { TailorResumeOutput } from "@/ai/flows/tailor-resume";
 
 const experienceSchema = z.object({
   title: z.string(),
@@ -52,6 +53,7 @@ const educationSchema = z.object({
 });
 
 const formSchema = z.object({
+  id: z.string().optional(),
   name: z.string().optional(),
   professionalTitle: z.string().optional(),
   email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
@@ -112,6 +114,7 @@ export default function Home() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      id: "",
       name: "",
       professionalTitle: "",
       email: "",
@@ -126,6 +129,43 @@ export default function Home() {
       photo: "",
     },
   });
+
+  useEffect(() => {
+    const resumeToEditJson = localStorage.getItem('resumeToEdit');
+    if (resumeToEditJson) {
+      try {
+        const resumeToEdit = JSON.parse(resumeToEditJson) as TailorResumeOutput & { id: string };
+        const { customizedResume } = resumeToEdit;
+        form.reset({
+          id: resumeToEdit.id,
+          name: customizedResume.name,
+          professionalTitle: customizedResume.professionalTitle,
+          email: customizedResume.email,
+          phone: customizedResume.phone,
+          linkedin: customizedResume.linkedin,
+          location: customizedResume.location,
+          website: customizedResume.website,
+          experiences: customizedResume.experience?.length ? customizedResume.experience : [{ title: "", company: "", dates: "", description: "" }],
+          educations: customizedResume.education?.length ? customizedResume.education : [{ degree: "", school: "", year: "", percentage: "" }],
+          skills: customizedResume.skills?.join(', '),
+          photo: customizedResume.photoDataUri,
+          jobDescription: "", // Clear job description for re-tailoring
+        });
+        if (customizedResume.photoDataUri) {
+          setPhotoPreview(customizedResume.photoDataUri);
+        }
+      } catch (e) {
+        console.error("Failed to parse resume to edit:", e);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not load the resume for editing.",
+        })
+      } finally {
+        localStorage.removeItem('resumeToEdit');
+      }
+    }
+  }, [form, toast]);
   
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
@@ -171,7 +211,8 @@ export default function Home() {
         description: "Your customized documents have been generated.",
       });
       // Store result in local storage and redirect
-      localStorage.setItem("resumeResult", JSON.stringify(response.data));
+      const resultData = { ...response.data, id: values.id };
+      localStorage.setItem("resumeResult", JSON.stringify(resultData));
       router.push("/results");
     } else {
       toast({
