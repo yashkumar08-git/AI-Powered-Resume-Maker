@@ -128,13 +128,10 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
-    }
     if(user && user.email) {
       form.setValue('email', user.email);
     }
-  }, [user, authLoading, router, form]);
+  }, [user, form]);
 
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
@@ -196,34 +193,6 @@ export default function Home() {
     }
     setPhotoPreview(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  if (authLoading || !user) {
-    return (
-       <div className="flex items-center justify-center min-h-[calc(100vh-200px)] w-full">
-         <Card className="w-full max-w-4xl mx-auto">
-            <CardHeader>
-              <Skeleton className="h-8 w-1/4" />
-              <Skeleton className="h-4 w-1/2 mt-2" />
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-                <div className="space-y-2">
-                    <Skeleton className="h-6 w-1/5" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                    <Skeleton className="h-6 w-1/5" />
-                    <Skeleton className="h-24 w-full" />
-                </div>
-                 <div className="space-y-2">
-                    <Skeleton className="h-6 w-1/5" />
-                    <Skeleton className="h-24 w-full" />
-                </div>
-                <Skeleton className="h-12 w-full mt-4" />
-            </CardContent>
-         </Card>
-       </div>
-    );
   }
 
   return (
