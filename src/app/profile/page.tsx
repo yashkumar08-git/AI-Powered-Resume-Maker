@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -51,7 +51,6 @@ export default function ProfilePage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="items-center text-center">
             <Avatar className="h-24 w-24 mb-4">
-                <AvatarImage src={user.photoURL || "https://placehold.co/100x100.png"} alt="User avatar" data-ai-hint="user avatar"/>
                 <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
             </Avatar>
             <CardTitle className="text-2xl">{user.displayName || user.email}</CardTitle>

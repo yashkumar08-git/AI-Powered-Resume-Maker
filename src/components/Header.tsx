@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
@@ -58,7 +58,6 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                      <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.photoURL || `https://placehold.co/100x100.png`} alt="User avatar" data-ai-hint="user avatar" />
                       <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
                     </Avatar>
                   </Button>
