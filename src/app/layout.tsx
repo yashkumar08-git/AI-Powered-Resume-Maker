@@ -4,7 +4,6 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
   title: 'Resume Maker',
@@ -32,14 +31,12 @@ export default function RootLayout({
           'h-full font-body antialiased'
         )}
       >
-        <AuthProvider>
-          <div className="relative flex flex-col min-h-screen bg-background/60">
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
-        </AuthProvider>
+        <div className="relative flex flex-col min-h-screen bg-background/60">
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </div>
+        <Toaster />
       </body>
     </html>
   );

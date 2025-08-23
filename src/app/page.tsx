@@ -1,14 +1,13 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { handleCustomizeResumeAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { CustomizeResumeOutput } from "@/ai/flows/tailor-resume";
-import { useAuth } from "@/hooks/use-auth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingState } from "@/components/LoadingState";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Wand2, Briefcase, FileText, PlusCircle, Trash2, GraduationCap, Star, Building, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 
 const experienceSchema = z.object({
@@ -110,8 +109,6 @@ export default function Home() {
   const { toast } = useToast();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  const { user, loading: authLoading } = useAuth();
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -130,12 +127,6 @@ export default function Home() {
     },
   });
   
-  useEffect(() => {
-    if (user && !authLoading) {
-      form.setValue('email', user.email || '');
-    }
-  }, [user, authLoading, form]);
-
   const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({
     control: form.control,
     name: "experiences",
@@ -205,7 +196,7 @@ export default function Home() {
     form.reset({
       name: "",
       professionalTitle: "",
-      email: user?.email || "",
+      email: "",
       phone: "",
       linkedin: "",
       location: "",
@@ -218,15 +209,6 @@ export default function Home() {
     });
     setPhotoPreview(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  if (authLoading) {
-    return (
-       <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
-         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-         <p className="text-lg text-muted-foreground">Loading your workspace...</p>
-       </div>
-    );
   }
 
   return (
