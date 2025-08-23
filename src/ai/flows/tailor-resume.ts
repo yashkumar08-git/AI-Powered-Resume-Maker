@@ -59,7 +59,10 @@ export async function customizeResume(input: CustomizeResumeInput): Promise<Cust
 const resumeOnlyPrompt = ai.definePrompt({
     name: 'resumeOnlyPrompt',
     input: {schema: CustomizeResumeInputSchema},
-    output: {schema: ResumeSchema, format: 'json'},
+    output: {schema: ResumeSchema},
+    config: {
+      responseFormat: 'json',
+    },
     prompt: `You are an expert resume writer. Your task is to generate a resume based on the provided information.
 
 If the user provides a resume and/or a job description, you will customize the resume to the job description, highlighting relevant skills and experience.
