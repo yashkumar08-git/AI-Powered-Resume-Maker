@@ -133,7 +133,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     }
   };
 
-  const handleEmail = () => {
+  const handleEmail = (isCoverLetter: boolean) => {
     if (!user || !user.email) {
       toast({
         variant: "destructive",
@@ -143,8 +143,18 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       return;
     }
     
-    const subject = "Your Generated Resume & Cover Letter";
-    const body = coverLetter;
+    const subject = isCoverLetter 
+        ? "Your Generated Cover Letter" 
+        : `Application for [Job Title] from ${customizedResume.name}`;
+
+    const body = isCoverLetter 
+        ? coverLetter 
+        : `Dear [Hiring Manager],
+
+Please find my resume attached for your consideration.
+
+Thank you,
+${customizedResume.name}`;
     
     const mailtoLink = `mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
@@ -153,11 +163,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   const DocumentActions = ({ contentRef, filename, isCoverLetter = false }: { contentRef: React.RefObject<HTMLDivElement>, filename: string, isCoverLetter?: boolean }) => (
     <div className="flex items-center gap-2 flex-wrap">
-      {isCoverLetter && user && (
+      {user && (
         <Button
           variant="outline"
           size="sm"
-          onClick={handleEmail}
+          onClick={() => handleEmail(isCoverLetter)}
         >
           <Mail className="mr-2 h-4 w-4" />
           Mail
