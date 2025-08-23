@@ -23,36 +23,47 @@ export function Header() {
     router.push('/login');
   };
 
-  const AuthButtons = () => (
-    <>
-      {loading ? (
-        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
+  const AuthButtons = ({ inSheet = false }: { inSheet?: boolean }) => {
+    const layoutClasses = inSheet 
+      ? "flex flex-col items-center gap-2 w-full" 
+      : "flex items-center gap-2";
+      
+    if (loading) {
+      return (
+        <div className={layoutClasses}>
           <div className="hidden sm:block">
             <Skeleton className="h-6 w-32" />
           </div>
           <Skeleton className="h-10 w-20" />
           <Skeleton className="h-10 w-24" />
         </div>
-      ) : user ? (
-        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
+      )
+    }
+    
+    if (user) {
+      return (
+        <div className={layoutClasses}>
           <p className="text-sm text-muted-foreground hidden sm:block">Welcome, {user.email}</p>
           <Button variant="ghost" onClick={handleSignOut} className="w-full md:w-auto">
             <LogOut />
             Logout
           </Button>
         </div>
-      ) : (
-        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
-          <Button variant="ghost" asChild className="w-full md:w-auto">
-            <Link href="/login"><LogIn/>Login</Link>
-          </Button>
-          <Button variant="default" asChild className="w-full md:w-auto">
-            <Link href="/signup"><UserPlus/>Sign Up</Link>
-          </Button>
-        </div>
-      )}
-    </>
-  );
+      )
+    }
+
+    return (
+      <div className={layoutClasses}>
+        <Button variant="ghost" asChild className="w-full md:w-auto">
+          <Link href="/login"><LogIn/>Login</Link>
+        </Button>
+        <Button variant="default" asChild className="w-full md:w-auto">
+          <Link href="/signup"><UserPlus/>Sign Up</Link>
+        </Button>
+      </div>
+    );
+  };
+
 
   return (
     <header className="py-4 px-4 sm:px-6 lg:px-8 border-b animate-fade-in-down sticky top-0 z-40 bg-background/80 backdrop-blur-md">
@@ -63,7 +74,7 @@ export function Header() {
           </div>
           <span className="text-lg sm:text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Resume Maker</span>
         </Link>
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex">
           <AuthButtons />
         </div>
         <div className="md:hidden">
@@ -75,7 +86,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent>
               <div className="flex flex-col items-center justify-center h-full gap-4 p-4">
-                <AuthButtons />
+                <AuthButtons inSheet={true} />
               </div>
             </SheetContent>
           </Sheet>
