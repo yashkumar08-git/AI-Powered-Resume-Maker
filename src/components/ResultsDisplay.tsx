@@ -173,10 +173,10 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
     setIsSaving(true);
     const response = await saveResumeAction(result, user.uid, resumeName);
     setIsSaving(false);
-    setIsSaveDialogOpen(false);
-    setResumeName("");
 
     if (response.success) {
+      setIsSaveDialogOpen(false);
+      setResumeName("");
       toast({
         title: "Resume Saved!",
         description: "Your resume has been successfully saved to your profile.",
@@ -280,6 +280,9 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                     </div>
                   </div>
                   <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                    </DialogClose>
                     <Button type="button" onClick={handleConfirmSave} disabled={isSaving}>
                        {isSaving ? (
                           <Loader className="mr-2 h-4 w-4 animate-spin" />
@@ -415,4 +418,5 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
       </Tabs>
     </div>
   );
-}
+
+    
