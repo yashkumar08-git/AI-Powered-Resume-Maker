@@ -29,10 +29,10 @@ export default function RootLayout({
       <body
         id="main-body"
         className={cn(
-          'min-h-screen bg-background font-body antialiased flex flex-col',
-          'bg-image'
+          'min-h-screen bg-background font-body antialiased flex flex-col'
         )}
       >
+        <div className="fixed inset-0 -z-10 bg-image-container" />
         <AuthProvider>
           <div className="relative flex flex-col min-h-screen bg-background/60">
             <Header />
