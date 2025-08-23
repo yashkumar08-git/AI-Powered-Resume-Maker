@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 export function Header() {
-  const isLoggedIn = true; // Placeholder for authentication state
+  const isLoggedIn = false; // Placeholder for authentication state
   
   return (
     <header className="py-4 px-4 sm:px-6 lg:px-8 border-b animate-fade-in-down sticky top-0 z-40 bg-background/80 backdrop-blur-md">
