@@ -45,3 +45,4 @@ This project is configured for deployment using **Firebase App Hosting**.
 
 After the deployment is complete, the Firebase CLI will give you a URL where you can access your live application. That's it! Your resume maker will be live on the web.
 # AI-Powered-Resume-Maker
+# AI-Powered-Resume-Maker
