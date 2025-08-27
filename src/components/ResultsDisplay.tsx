@@ -428,5 +428,5 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
       </Tabs>
     </div>
   );
-
+}
     

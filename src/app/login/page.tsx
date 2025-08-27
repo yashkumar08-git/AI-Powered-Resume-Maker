@@ -21,26 +21,33 @@ import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Loader } from "lucide-react";
 
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [captcha, setCaptcha] = useState({ num1: 0, num2: 0, answer: 0 });
+  const [captcha, setCaptcha] = useState({ num1: 0, num2: 0 });
+
+  const generateCaptcha = useCallback(() => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    setCaptcha({ num1, num2 });
+  }, []);
 
   const formSchema = useMemo(() => z.object({
     email: z.string().email(),
     password: z.string().min(1, { message: "Password is required." }),
-    captcha: z.string().refine((val) => parseInt(val) === captcha.answer, {
+    captcha: z.string().refine((val) => parseInt(val) === (captcha.num1 + captcha.num2), {
       message: "Incorrect captcha answer.",
     }),
-  }), [captcha.answer]);
+  }), [captcha]);
+
 
   useEffect(() => {
     generateCaptcha();
-  }, []);
+  }, [generateCaptcha]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,20 +58,14 @@ export default function LoginPage() {
     },
   });
   
-  // Reset form with new default values when captcha changes
   useEffect(() => {
     form.reset({
-      email: form.getValues("email"),
-      password: form.getValues("password"),
-      captcha: "",
-    });
-  }, [captcha, form]);
+      ...form.getValues(),
+      captcha: ''
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [captcha]);
 
-  const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    setCaptcha({ num1, num2, answer: num1 + num2 });
-  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -79,6 +80,7 @@ export default function LoginPage() {
         description: error.message,
       });
       generateCaptcha(); // Regenerate captcha on failed login
+      form.setValue('captcha', '');
     } finally {
       setIsLoading(false);
     }

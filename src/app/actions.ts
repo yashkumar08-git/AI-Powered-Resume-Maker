@@ -35,7 +35,7 @@ export async function handleTailorResumeAction(
     });
     
     // Pass photo through if AI misses it.
-    if (validation.data.photoDataUri) {
+    if (validation.data.photoDataUri && !result.customizedResume.photoDataUri) {
       result.customizedResume.photoDataUri = validation.data.photoDataUri;
     }
     
@@ -62,8 +62,9 @@ export async function saveResumeAction(
     // Separate photo data
     const photoDataUri = resumeData.customizedResume.photoDataUri;
     const resumeToSave = { ...resumeData };
-    // @ts-ignore
-    delete resumeToSave.customizedResume.photoDataUri;
+    if (resumeToSave.customizedResume.photoDataUri) {
+        delete resumeToSave.customizedResume.photoDataUri;
+    }
 
     const dataToSave = {
       userId,
@@ -74,27 +75,28 @@ export async function saveResumeAction(
     };
 
     const batch = writeBatch(db);
-    let newResumeId = resumeId;
+    let docId = resumeId;
+    let resumeRef;
 
-    if (resumeId) {
+    if (docId) {
       // Update existing document
-      const resumeRef = doc(db, "resumes", resumeId);
+      resumeRef = doc(db, "resumes", docId);
       batch.set(resumeRef, dataToSave, { merge: true });
     } else {
       // Create new document
-      const resumeRef = doc(collection(db, "resumes"));
+      resumeRef = doc(collection(db, "resumes"));
       batch.set(resumeRef, dataToSave);
-      newResumeId = resumeRef.id;
+      docId = resumeRef.id;
     }
 
-    if (photoDataUri && newResumeId) {
-      const photoRef = doc(db, "resumes_photos", newResumeId);
+    if (photoDataUri && docId) {
+      const photoRef = doc(db, "resumes_photos", docId);
       batch.set(photoRef, { photoDataUri });
     }
 
     await batch.commit();
 
-    return { success: true, id: newResumeId };
+    return { success: true, id: docId };
 
   } catch (error: any) {
     console.error("Error saving resume to Firestore:", error);
