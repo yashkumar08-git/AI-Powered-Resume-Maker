@@ -55,7 +55,7 @@ export type TailorResumeOutput = z.infer<typeof TailorResumeOutputSchema>;
 export async function tailorResume(input: TailorResumeInput): Promise<TailorResumeOutput> {
   const result = await tailorResumeFlow(input);
   // Ensure photo is passed through if the model misses it.
-  if (input.photoDataUri && !result.customizedResume.photoDataUri) {
+  if (input.photoDataUri) {
     result.customizedResume.photoDataUri = input.photoDataUri;
   }
   return result;
@@ -100,12 +100,6 @@ const tailorResumeFlow = ai.defineFlow(
     if (!output) {
       throw new Error("Failed to generate the resume and cover letter.");
     }
-    
-    // Restore the original photo URI in the final output if the model misses it
-    if (input.photoDataUri && !output.customizedResume.photoDataUri) {
-      output.customizedResume.photoDataUri = input.photoDataUri;
-    }
-    
     return output;
   }
 );

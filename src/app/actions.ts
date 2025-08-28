@@ -34,11 +34,6 @@ export async function handleTailorResumeAction(
       photoDataUri: validation.data.photoDataUri,
     });
     
-    // Pass photo through if AI misses it.
-    if (validation.data.photoDataUri && !result.customizedResume.photoDataUri) {
-      result.customizedResume.photoDataUri = validation.data.photoDataUri;
-    }
-    
     return { success: true, data: result };
   } catch (e: any) {
     console.error(e);
