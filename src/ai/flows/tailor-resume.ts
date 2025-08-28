@@ -101,17 +101,49 @@ const tailorResumeFlow = ai.defineFlow(
     outputSchema: TailorResumeOutputSchema,
   },
   async (input) => {
-    const result = await tailorResumePrompt(input);
-    const output = result.output;
+    let result = await tailorResumePrompt(input);
+    let output = result.output;
+
+    const MAX_RETRIES = 2;
+    let attempt = 1;
+
+    // If 'both' were requested, but one is missing, retry.
+    while (
+      input.generationType === 'both' &&
+      (!output?.customizedResume || !output?.coverLetter) &&
+      attempt < MAX_RETRIES
+    ) {
+      attempt++;
+      // Create a new input for the retry, asking for the missing piece.
+      const retryInput: TailorResumeInput = { ...input };
+      const missingParts: string[] = [];
+      if (!output?.customizedResume) missingParts.push('resume');
+      if (!output?.coverLetter) missingParts.push('cover letter');
+
+      retryInput.resume = `Original Resume: ${input.resume}\nOriginal Job Description: ${input.jobDescription}\nPREVIOUSLY GENERATED: ${JSON.stringify(output || {}, null, 2)}\n\nYou failed to generate all the required documents. Please generate the missing parts: ${missingParts.join(' and ')}.`;
+      
+      const retryResult = await tailorResumePrompt(retryInput);
+      const retryOutput = retryResult.output;
+
+      // Merge the results
+      if (retryOutput) {
+        if (!output) {
+          output = {};
+        }
+        if (retryOutput.customizedResume && !output.customizedResume) {
+          output.customizedResume = retryOutput.customizedResume;
+        }
+        if (retryOutput.coverLetter && !output.coverLetter) {
+          output.coverLetter = retryOutput.coverLetter;
+        }
+      }
+    }
+    
     if (!output) {
       throw new Error("Failed to generate the requested documents.");
     }
     
-    // Ensure that at least one of the requested documents has been generated
-    if (!output.customizedResume && !output.coverLetter) {
-      throw new Error("No documents could be generated from the provided input.");
-    }
-
+    // Final check after retries
     if (input.generationType === 'both' && (!output.customizedResume || !output.coverLetter)) {
         throw new Error("The AI failed to generate both the resume and the cover letter. Please try again.");
     }
@@ -120,6 +152,9 @@ const tailorResumeFlow = ai.defineFlow(
     }
     if (input.generationType === 'coverLetter' && !output.coverLetter) {
         throw new Error("The cover letter cound not be generated.");
+    }
+     if (!output.customizedResume && !output.coverLetter) {
+      throw new Error("No documents could be generated from the provided input.");
     }
 
     return output;
