@@ -107,30 +107,34 @@ const tailorResumeFlow = ai.defineFlow(
     const MAX_RETRIES = 2;
     let attempt = 1;
 
-    // If 'both' were requested, but one is missing, retry.
+    const needsResume = input.generationType === 'resume' || input.generationType === 'both';
+    const needsCoverLetter = input.generationType === 'coverLetter' || input.generationType === 'both';
+
+    // Retry if any of the requested documents are missing
     while (
-      input.generationType === 'both' &&
-      (!output?.customizedResume || !output?.coverLetter) &&
+      (needsResume && !output?.customizedResume) ||
+      (needsCoverLetter && !output?.coverLetter) &&
       attempt < MAX_RETRIES
     ) {
       attempt++;
-      // Create a new input for the retry, asking for the missing piece.
       const retryInput: TailorResumeInput = { ...input };
       const missingParts: string[] = [];
-      if (!output?.customizedResume) {
+      let newGenerationType: 'resume' | 'coverLetter' | 'both' = 'resume';
+
+      if (needsResume && !output?.customizedResume) {
         missingParts.push('resume');
-        retryInput.generationType = 'resume';
+        newGenerationType = 'resume';
       }
-      if (!output?.coverLetter) {
+      if (needsCoverLetter && !output?.coverLetter) {
         missingParts.push('cover letter');
-        retryInput.generationType = 'coverLetter';
+        newGenerationType = 'coverLetter';
       }
 
-      if (missingParts.length === 2) {
-        retryInput.generationType = 'both';
+      // If both were originally requested and both are missing, ask for both again.
+      if (needsResume && !output?.customizedResume && needsCoverLetter && !output?.coverLetter) {
+        newGenerationType = 'both';
       }
-
-
+      retryInput.generationType = newGenerationType;
       retryInput.resume = `Original Resume: ${input.resume}\nOriginal Job Description: ${input.jobDescription}\nPREVIOUSLY GENERATED: ${JSON.stringify(output || {}, null, 2)}\n\nYou failed to generate all the required documents. Please generate the missing parts: ${missingParts.join(' and ')}.`;
       
       const retryResult = await tailorResumePrompt(retryInput);
@@ -155,14 +159,14 @@ const tailorResumeFlow = ai.defineFlow(
     }
     
     // Final check after retries
-    if (input.generationType === 'both' && (!output.customizedResume || !output.coverLetter)) {
-        throw new Error("The AI failed to generate both the resume and the cover letter. Please try again.");
+    if (needsResume && !output.customizedResume && needsCoverLetter && !output.coverLetter) {
+      throw new Error("The AI failed to generate both the resume and the cover letter. Please try again.");
     }
-    if (input.generationType === 'resume' && !output.customizedResume) {
-        throw new Error("The resume could not be generated.");
+    if (needsResume && !output.customizedResume && !needsCoverLetter) {
+      throw new Error("The resume could not be generated.");
     }
-    if (input.generationType === 'coverLetter' && !output.coverLetter) {
-        throw new Error("The cover letter could not be generated.");
+    if (needsCoverLetter && !output.coverLetter && !needsResume) {
+      throw new Error("The cover letter could not be generated.");
     }
      if (!output.customizedResume && !output.coverLetter) {
       throw new Error("No documents could be generated from the provided input.");
