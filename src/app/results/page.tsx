@@ -17,7 +17,14 @@ export default function ResultsPage() {
     const storedResult = localStorage.getItem('resumeResult');
     if (storedResult) {
       try {
-        setResult(JSON.parse(storedResult));
+        const parsedResult = JSON.parse(storedResult);
+        // Basic validation to ensure we have something to show
+        if(parsedResult.customizedResume || parsedResult.coverLetter) {
+            setResult(parsedResult);
+        } else {
+            console.error("Parsed result is empty, redirecting.");
+            router.push('/');
+        }
       } catch (error) {
         console.error("Failed to parse resume result from localStorage", error);
         // Handle error, maybe redirect back to home

@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Accordion,
   AccordionContent,
@@ -66,6 +67,7 @@ const formSchema = z.object({
   skills: z.string().optional(),
   jobDescription: z.string().optional(),
   photo: z.string().optional(),
+  generationType: z.enum(['resume', 'coverLetter', 'both']).default('resume'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -127,6 +129,7 @@ export default function Home() {
       skills: "",
       jobDescription: "",
       photo: "",
+      generationType: "resume",
     },
   });
 
@@ -138,20 +141,21 @@ export default function Home() {
         const { customizedResume } = resumeToEdit;
         form.reset({
           id: resumeToEdit.id,
-          name: customizedResume.name,
-          professionalTitle: customizedResume.professionalTitle,
-          email: customizedResume.email,
-          phone: customizedResume.phone,
-          linkedin: customizedResume.linkedin,
-          location: customizedResume.location,
-          website: customizedResume.website,
-          experiences: customizedResume.experience?.length ? customizedResume.experience : [{ title: "", company: "", dates: "", description: "" }],
-          educations: customizedResume.education?.length ? customizedResume.education : [{ degree: "", school: "", year: "", percentage: "" }],
-          skills: customizedResume.skills?.join(', '),
-          photo: customizedResume.photoDataUri,
+          name: customizedResume?.name,
+          professionalTitle: customizedResume?.professionalTitle,
+          email: customizedResume?.email,
+          phone: customizedResume?.phone,
+          linkedin: customizedResume?.linkedin,
+          location: customizedResume?.location,
+          website: customizedResume?.website,
+          experiences: customizedResume?.experience?.length ? customizedResume.experience : [{ title: "", company: "", dates: "", description: "" }],
+          educations: customizedResume?.education?.length ? customizedResume.education : [{ degree: "", school: "", year: "", percentage: "" }],
+          skills: customizedResume?.skills?.join(', '),
+          photo: customizedResume?.photoDataUri,
           jobDescription: "", // Clear job description for re-tailoring
+          generationType: "resume",
         });
-        if (customizedResume.photoDataUri) {
+        if (customizedResume?.photoDataUri) {
           setPhotoPreview(customizedResume.photoDataUri);
         }
       } catch (e) {
@@ -201,6 +205,7 @@ export default function Home() {
         resume: resumeText, 
         jobDescription: values.jobDescription || "",
         photoDataUri: values.photo,
+        generationType: values.generationType,
       }
     );
 
@@ -208,7 +213,7 @@ export default function Home() {
     if (response.success && response.data) {
       toast({
         title: "Success!",
-        description: "Your customized resume has been generated.",
+        description: "Your documents have been generated.",
       });
       // Store result in local storage and redirect
       const resultData = { ...response.data, id: values.id };
@@ -223,6 +228,22 @@ export default function Home() {
       });
     }
   };
+
+  const generationType = form.watch("generationType");
+
+  const submitButtonText = () => {
+    switch (generationType) {
+      case 'resume':
+        return 'Craft My Resume';
+      case 'coverLetter':
+        return 'Craft My Cover Letter';
+      case 'both':
+        return 'Craft Resume & Cover Letter';
+      default:
+        return 'Craft My Resume';
+    }
+  }
+
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
@@ -249,7 +270,49 @@ export default function Home() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-                <Accordion type="multiple" className="w-full" defaultValue={["item-1", "item-2", "item-3", "item-4", "item-5"]}>
+               <FormField
+                  control={form.control}
+                  name="generationType"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3 p-4 rounded-md bg-accent/30">
+                      <FormLabel className="text-lg font-semibold">What would you like to generate?</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col sm:flex-row gap-4"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="resume" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Resume Only
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="coverLetter" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Cover Letter Only
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="both" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Resume & Cover Letter
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Accordion type="multiple" className="w-full" defaultValue={["item-1", "item-5"]}>
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
                   <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
@@ -535,7 +598,7 @@ export default function Home() {
                     <Loader className="mr-2 animate-spin" />
                     Generating...
                   </>
-                ) : 'Craft My Resume'}
+                ) : submitButtonText()}
               </Button>
             </form>
           </Form>

@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Download, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2, Save, Loader } from "lucide-react";
+import { Download, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2, Save, Loader, FileText as FileTextIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -46,7 +47,8 @@ interface ResultsDisplayProps {
 export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const { toast } = useToast();
   const resumeRef = useRef<HTMLDivElement>(null);
-  const { customizedResume } = result;
+  const coverLetterRef = useRef<HTMLDivElement>(null);
+  const { customizedResume, coverLetter } = result;
   const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -241,15 +243,18 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
     </div>
   );
 
+  const hasBoth = customizedResume && coverLetter;
+  const defaultTab = customizedResume ? "resume" : "cover-letter";
+
   return (
     <div className="w-full animate-fade-in-up">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <div className="flex-1">
              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                Your Customized Resume
+                Your Generated Documents
             </h2>
             <p className="text-muted-foreground mt-1">
-                Your resume is ready.
+                Your documents are ready.
             </p>
           </div>
          
@@ -258,7 +263,7 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                 <FilePlus2 className="mr-2 h-4 w-4" />
                 Create New
             </Button>
-            {user && (
+            {user && customizedResume && (
               <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
                 <DialogTrigger asChild>
                     <Button>
@@ -270,7 +275,7 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                   <DialogHeader>
                     <DialogTitle>Save Resume</DialogTitle>
                     <DialogDescription>
-                      Give your resume a name to easily identify it later.
+                      Give your resume a name to easily identify it later. This will only save the resume content.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
@@ -301,93 +306,137 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                 </DialogContent>
               </Dialog>
             )}
-            <TemplateSwitcher
-                activeTemplate={activeTemplate}
-                onTemplateChange={setActiveTemplate}
-              />
+             {customizedResume && (
+                <TemplateSwitcher
+                    activeTemplate={activeTemplate}
+                    onTemplateChange={setActiveTemplate}
+                />
+             )}
           </div>
         </div>
-          <Card className="shadow-none bg-white/5">
-            <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b">
-              <div className="flex-1">
-                <CardTitle>Customized Resume</CardTitle>
-                <CardDescription>
-                  Optimized for the job description.
-                </CardDescription>
-              </div>
-              <DocumentActions filename="customized-resume" contentRef={resumeRef} />
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
-                <div ref={resumeRef} className={cn("p-6 sm:p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed resume-container", `template-${activeTemplate}`)}>
-                  {/* Header */}
-                  <header className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 resume-header gap-4">
-                    <div className="flex-1">
-                      <h1 className="text-3xl md:text-5xl font-extrabold text-gray-800 tracking-tight resume-name">{customizedResume.name}</h1>
-                      {customizedResume.professionalTitle && <p className="text-lg md:text-2xl text-primary font-semibold mt-2 resume-title">{customizedResume.professionalTitle}</p>}
-                    </div>
-                    {customizedResume.photoDataUri && (
-                       <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={120} height={120} className="rounded-full object-cover w-24 h-24 sm:w-32 sm:h-32 border-4 border-primary/50 shadow-md resume-photo" />
-                    )}
-                  </header>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-between items-start sm:items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 resume-contact-info gap-4">
-                    {customizedResume.email && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><MailIcon size={16} className="text-primary shrink-0"/> {customizedResume.email}</p>}
-                    {customizedResume.phone && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Phone size={16} className="text-primary shrink-0"/> {customizedResume.phone}</p>}
-                    {customizedResume.linkedin && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Linkedin size={16} className="text-primary shrink-0"/> <a href={customizedResume.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.linkedin.replace('https://', '').replace('www.', '')}</a></p>}
-                    {customizedResume.location && <p className="flex items-center gap-3 text-xs sm:text-sm"><MapPin size={16} className="text-primary shrink-0"/> {customizedResume.location}</p>}
-                    {customizedResume.website && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Globe size={16} className="text-primary shrink-0"/> <a href={customizedResume.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.website.replace('https://', '').replace('www.', '')}</a></p>}
-                  </div>
-                  
-                  {/* Summary */}
-                  <section className="mb-8 resume-section">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><User/> Professional Summary</h2>
-                    <p className="text-sm sm:text-base resume-section-content">{customizedResume.summary}</p>
-                  </section>
-
-                  {/* Work Experience */}
-                  <section className="mb-8 resume-section">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Briefcase/> Work Experience</h2>
-                    {customizedResume.experience.map((exp, index) => (
-                      <div key={index} className="mb-6 resume-item">
-                        <div className="flex flex-col sm:flex-row justify-between sm:items-baseline">
-                           <h3 className="text-lg sm:text-xl font-bold text-gray-800 resume-item-title">{exp.title}</h3>
-                           <p className="text-sm sm:text-base text-gray-600 font-medium resume-item-dates">{exp.dates}</p>
-                        </div>
-                        <p className="text-base sm:text-lg font-semibold text-primary resume-item-subtitle">{exp.company}</p>
-                        <p className="mt-2 text-sm sm:text-base whitespace-pre-line resume-item-description">{exp.description}</p>
-                      </div>
-                    ))}
-                  </section>
-
-                  {/* Education */}
-                  <section className="mb-8 resume-section">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><GraduationCap/> Education</h2>
-                    {customizedResume.education.map((edu, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row justify-between sm:items-start mb-4 resume-item">
+        <Tabs defaultValue={defaultTab} className="w-full">
+            {hasBoth && (
+                 <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+                    <TabsTrigger value="resume">Resume</TabsTrigger>
+                    <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
+                </TabsList>
+            )}
+            {customizedResume && (
+                 <TabsContent value="resume">
+                    <Card className="shadow-none bg-white/5 mt-4">
+                        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b">
                         <div className="flex-1">
-                            <h3 className="text-lg sm:text-xl font-bold text-gray-800 resume-item-title">{edu.degree}</h3>
-                            <p className="text-base sm:text-lg font-semibold text-primary resume-item-subtitle">{edu.school}</p>
-                             {edu.percentage && <p className="text-sm sm:text-base text-gray-600 mt-1 resume-item-gpa">Percentage/GPA: {edu.percentage}</p>}
+                            <CardTitle>Customized Resume</CardTitle>
+                            <CardDescription>
+                            Optimized for the job description.
+                            </CardDescription>
                         </div>
-                        <p className="text-sm sm:text-base text-gray-600 font-medium resume-item-dates mt-1 sm:mt-0">{edu.year}</p>
-                      </div>
-                    ))}
-                  </section>
+                        <DocumentActions filename="customized-resume" contentRef={resumeRef} />
+                        </CardHeader>
+                        <CardContent className="p-0">
+                        <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
+                            <div ref={resumeRef} className={cn("p-6 sm:p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed resume-container", `template-${activeTemplate}`)}>
+                            {/* Header */}
+                            <header className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 resume-header gap-4">
+                                <div className="flex-1">
+                                <h1 className="text-3xl md:text-5xl font-extrabold text-gray-800 tracking-tight resume-name">{customizedResume.name}</h1>
+                                {customizedResume.professionalTitle && <p className="text-lg md:text-2xl text-primary font-semibold mt-2 resume-title">{customizedResume.professionalTitle}</p>}
+                                </div>
+                                {customizedResume.photoDataUri && (
+                                <Image src={customizedResume.photoDataUri} alt="Profile Photo" width={120} height={120} className="rounded-full object-cover w-24 h-24 sm:w-32 sm:h-32 border-4 border-primary/50 shadow-md resume-photo" />
+                                )}
+                            </header>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-between items-start sm:items-center bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 resume-contact-info gap-4">
+                                {customizedResume.email && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><MailIcon size={16} className="text-primary shrink-0"/> {customizedResume.email}</p>}
+                                {customizedResume.phone && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Phone size={16} className="text-primary shrink-0"/> {customizedResume.phone}</p>}
+                                {customizedResume.linkedin && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Linkedin size={16} className="text-primary shrink-0"/> <a href={customizedResume.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.linkedin.replace('https://', '').replace('www.', '')}</a></p>}
+                                {customizedResume.location && <p className="flex items-center gap-3 text-xs sm:text-sm"><MapPin size={16} className="text-primary shrink-0"/> {customizedResume.location}</p>}
+                                {customizedResume.website && <p className="flex items-center gap-3 text-xs sm:text-sm break-all"><Globe size={16} className="text-primary shrink-0"/> <a href={customizedResume.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{customizedResume.website.replace('https://', '').replace('www.', '')}</a></p>}
+                            </div>
+                            
+                            {/* Summary */}
+                            <section className="mb-8 resume-section">
+                                <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><User/> Professional Summary</h2>
+                                <p className="text-sm sm:text-base resume-section-content">{customizedResume.summary}</p>
+                            </section>
 
-                  {/* Skills */}
-                  <section className="resume-section resume-skills-container">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Star/> Skills</h2>
-                    <div className="flex flex-wrap gap-2 sm:gap-3 resume-skills">
-                      {customizedResume.skills.map((skill, index) => (
-                        <span key={index} className="bg-primary/10 text-primary-foreground font-semibold px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-base resume-skill-item">{skill}</span>
-                      ))}
-                    </div>
-                  </section>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                            {/* Work Experience */}
+                            {customizedResume.experience?.length > 0 && (
+                                <section className="mb-8 resume-section">
+                                <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Briefcase/> Work Experience</h2>
+                                {customizedResume.experience.map((exp, index) => (
+                                    <div key={index} className="mb-6 resume-item">
+                                    <div className="flex flex-col sm:flex-row justify-between sm:items-baseline">
+                                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 resume-item-title">{exp.title}</h3>
+                                    <p className="text-sm sm:text-base text-gray-600 font-medium resume-item-dates">{exp.dates}</p>
+                                    </div>
+                                    <p className="text-base sm:text-lg font-semibold text-primary resume-item-subtitle">{exp.company}</p>
+                                    <p className="mt-2 text-sm sm:text-base whitespace-pre-line resume-item-description">{exp.description}</p>
+                                    </div>
+                                ))}
+                                </section>
+                            )}
+
+                            {/* Education */}
+                             {customizedResume.education?.length > 0 && (
+                                <section className="mb-8 resume-section">
+                                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><GraduationCap/> Education</h2>
+                                    {customizedResume.education.map((edu, index) => (
+                                    <div key={index} className="flex flex-col sm:flex-row justify-between sm:items-start mb-4 resume-item">
+                                        <div className="flex-1">
+                                            <h3 className="text-lg sm:text-xl font-bold text-gray-800 resume-item-title">{edu.degree}</h3>
+                                            <p className="text-base sm:text-lg font-semibold text-primary resume-item-subtitle">{edu.school}</p>
+                                            {edu.percentage && <p className="text-sm sm:text-base text-gray-600 mt-1 resume-item-gpa">Percentage/GPA: {edu.percentage}</p>}
+                                        </div>
+                                        <p className="text-sm sm:text-base text-gray-600 font-medium resume-item-dates mt-1 sm:mt-0">{edu.year}</p>
+                                    </div>
+                                    ))}
+                                </section>
+                             )}
+
+                            {/* Skills */}
+                            {customizedResume.skills?.length > 0 && (
+                                <section className="resume-section resume-skills-container">
+                                <h2 className="text-xl md:text-2xl font-bold text-gray-800 border-b-2 border-primary pb-2 mb-4 flex items-center gap-3 resume-section-title"><Star/> Skills</h2>
+                                <div className="flex flex-wrap gap-2 sm:gap-3 resume-skills">
+                                    {customizedResume.skills.map((skill, index) => (
+                                    <span key={index} className="bg-primary/10 text-primary-foreground font-semibold px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-base resume-skill-item">{skill}</span>
+                                    ))}
+                                </div>
+                                </section>
+                            )}
+                            </div>
+                        </div>
+                        </CardContent>
+                    </Card>
+                 </TabsContent>
+            )}
+
+            {coverLetter && (
+                <TabsContent value="cover-letter">
+                    <Card className="shadow-none bg-white/5 mt-4">
+                        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b">
+                            <div className="flex-1">
+                                <CardTitle>AI-Generated Cover Letter</CardTitle>
+                                <CardDescription>
+                                A cover letter tailored to the job description.
+                                </CardDescription>
+                            </div>
+                            <DocumentActions filename="cover-letter" contentRef={coverLetterRef} />
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="p-4 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
+                                <div ref={coverLetterRef} className="p-6 sm:p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed">
+                                    <div className="whitespace-pre-line text-base">
+                                        {coverLetter}
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            )}
+        </Tabs>
     </div>
   );
 }
-    

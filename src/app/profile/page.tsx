@@ -20,12 +20,13 @@ import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
-type SavedResume = Omit<TailorResumeOutput, 'customizedResume'> & { 
+type SavedResume = Omit<TailorResumeOutput, 'customizedResume' | 'coverLetter'> & { 
   id: string, 
   createdAt: { seconds: number, nanoseconds: number }, 
   resumeName?: string, 
   professionalTitle?: string,
-  customizedResume: Omit<TailorResumeOutput['customizedResume'], 'photoDataUri'> & { photoDataUri?: string }
+  customizedResume: Omit<NonNullable<TailorResumeOutput['customizedResume']>, 'photoDataUri'> & { photoDataUri?: string },
+  coverLetter?: string,
 };
 
 export default function ProfilePage() {

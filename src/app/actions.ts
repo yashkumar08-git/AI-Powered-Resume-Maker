@@ -11,6 +11,7 @@ const formSchema = z.object({
   resume: z.string(),
   jobDescription: z.string().optional().default(''),
   photoDataUri: z.string().optional(),
+  generationType: z.enum(['resume', 'coverLetter', 'both']).default('resume'),
 });
 
 type ActionResponse = 
@@ -18,7 +19,7 @@ type ActionResponse =
   | { success: false, error: string };
 
 export async function handleTailorResumeAction(
-  formData: { resume: string; jobDescription?: string; photoDataUri?: string },
+  formData: { resume: string; jobDescription?: string; photoDataUri?: string, generationType: 'resume' | 'coverLetter' | 'both' },
 ): Promise<ActionResponse> {
   const validation = formSchema.safeParse(formData);
 
@@ -32,6 +33,7 @@ export async function handleTailorResumeAction(
       resume: validation.data.resume,
       jobDescription: validation.data.jobDescription,
       photoDataUri: validation.data.photoDataUri,
+      generationType: validation.data.generationType,
     });
     
     return { success: true, data: result };
@@ -39,7 +41,7 @@ export async function handleTailorResumeAction(
     console.error(e);
     // Provide a more specific error message to the user.
     const errorMessage = e.message || "An unexpected error occurred. Please try again later.";
-    return { success: false, error: `Failed to generate resume: ${errorMessage}` };
+    return { success: false, error: `Failed to generate documents: ${errorMessage}` };
   }
 }
 
@@ -51,6 +53,9 @@ export async function saveResumeAction(
 ): Promise<{ success: boolean, error?: string, id?: string }> {
   if (!userId) {
     return { success: false, error: "User must be logged in to save." };
+  }
+  if (!resumeData.customizedResume) {
+      return { success: false, error: "Cannot save a document without a resume." };
   }
 
   try {
@@ -138,7 +143,7 @@ export async function getResumeWithPhotoAction(resumeId: string): Promise<{ succ
         const photoRef = doc(db, "resumes_photos", resumeId);
         const photoSnap = await getDoc(photoRef);
 
-        if (photoSnap.exists()) {
+        if (photoSnap.exists() && resumeData.customizedResume) {
             // @ts-ignore
             resumeData.customizedResume.photoDataUri = photoSnap.data().photoDataUri;
         }
