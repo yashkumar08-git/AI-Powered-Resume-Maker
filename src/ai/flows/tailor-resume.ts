@@ -80,7 +80,7 @@ If the user provides a resume and/or a job description, you will customize the d
 
 If the user provides an empty resume and an empty job description, you MUST generate a high-quality, complete sample resume and/or cover letter for a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
 
-If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object. Do not process or change the photo data URI.
+If a photo is provided in the input and you are generating a resume, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object. Do not process or change the photo data URI.
 
 Resume:
 {{{resume}}}
@@ -110,6 +110,16 @@ const tailorResumeFlow = ai.defineFlow(
     // Ensure that at least one of the requested documents has been generated
     if (!output.customizedResume && !output.coverLetter) {
       throw new Error("No documents could be generated from the provided input.");
+    }
+
+    if (input.generationType === 'both' && (!output.customizedResume || !output.coverLetter)) {
+        throw new Error("The AI failed to generate both the resume and the cover letter. Please try again.");
+    }
+    if (input.generationType === 'resume' && !output.customizedResume) {
+        throw new Error("The resume could not be generated.");
+    }
+    if (input.generationType === 'coverLetter' && !output.coverLetter) {
+        throw new Error("The cover letter cound not be generated.");
     }
 
     return output;
