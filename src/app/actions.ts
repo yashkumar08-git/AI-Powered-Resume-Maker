@@ -11,7 +11,7 @@ const formSchema = z.object({
   resume: z.string(),
   jobDescription: z.string().optional().default(''),
   photoDataUri: z.string().optional(),
-  generationType: z.enum(['resume', 'coverLetter', 'both']).default('resume'),
+  generationType: z.enum(['resume', 'both']).default('resume'),
 });
 
 type ActionResponse = 
@@ -19,7 +19,7 @@ type ActionResponse =
   | { success: false, error: string };
 
 export async function handleTailorResumeAction(
-  formData: { resume: string; jobDescription?: string; photoDataUri?: string, generationType: 'resume' | 'coverLetter' | 'both' },
+  formData: { resume: string; jobDescription?: string; photoDataUri?: string, generationType: 'resume' | 'both' },
 ): Promise<ActionResponse> {
   const validation = formSchema.safeParse(formData);
 

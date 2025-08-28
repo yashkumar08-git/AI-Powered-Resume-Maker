@@ -67,7 +67,7 @@ const formSchema = z.object({
   skills: z.string().optional(),
   jobDescription: z.string().optional(),
   photo: z.string().optional(),
-  generationType: z.enum(['resume', 'coverLetter', 'both']).default('resume'),
+  generationType: z.enum(['resume', 'both']).default('resume'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -235,8 +235,6 @@ export default function Home() {
     switch (generationType) {
       case 'resume':
         return 'Craft My Resume';
-      case 'coverLetter':
-        return 'Craft My Cover Letter';
       case 'both':
         return 'Craft Resume & Cover Letter';
       default:
@@ -288,14 +286,6 @@ export default function Home() {
                             </FormControl>
                             <FormLabel className="font-normal">
                               Resume Only
-                            </FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl>
-                              <RadioGroupItem value="coverLetter" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              Cover Letter Only
                             </FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">

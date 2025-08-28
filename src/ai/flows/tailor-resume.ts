@@ -18,7 +18,7 @@ const TailorResumeInputSchema = z.object({
     .describe('The resume of the user as plain text.'),
   jobDescription: z.string().optional().default('').describe('The job description to customize the resume to.'),
   photoDataUri: z.string().optional().describe("A profile photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
-  generationType: z.enum(['resume', 'coverLetter', 'both']).default('resume').describe('What to generate: just the resume, just the cover letter, or both.'),
+  generationType: z.enum(['resume', 'both']).default('resume').describe('What to generate: just the resume, or both resume and cover letter.'),
 });
 export type TailorResumeInput = z.infer<typeof TailorResumeInputSchema>;
 
@@ -73,7 +73,6 @@ Your output MUST be a single JSON object that conforms to the provided JSON sche
 
 The user has specified what to generate with the 'generationType' field.
 - If 'generationType' is 'resume', you MUST generate only the 'customizedResume' object.
-- If 'generationType' is 'coverLetter', you MUST generate only the 'coverLetter' string.
 - If 'generationType' is 'both', you MUST generate both the 'customizedResume' object and the 'coverLetter' string.
 
 If the user provides a resume and/or a job description, you will customize the documents to the job description, highlighting relevant skills and experience.
@@ -108,7 +107,7 @@ const tailorResumeFlow = ai.defineFlow(
     let attempt = 1;
 
     const needsResume = input.generationType === 'resume' || input.generationType === 'both';
-    const needsCoverLetter = input.generationType === 'coverLetter' || input.generationType === 'both';
+    const needsCoverLetter = input.generationType === 'both';
 
     // Retry if any of the requested documents are missing
     while (
@@ -119,7 +118,7 @@ const tailorResumeFlow = ai.defineFlow(
       attempt++;
       const retryInput: TailorResumeInput = { ...input };
       const missingParts: string[] = [];
-      let newGenerationType: 'resume' | 'coverLetter' | 'both' = 'resume';
+      let newGenerationType: 'resume' | 'both' = 'resume';
 
       if (needsResume && !output?.customizedResume) {
         missingParts.push('resume');
@@ -127,9 +126,10 @@ const tailorResumeFlow = ai.defineFlow(
       }
       if (needsCoverLetter && !output?.coverLetter) {
         missingParts.push('cover letter');
-        newGenerationType = 'coverLetter';
+        // If we need a cover letter, we assume we also still need a resume if both were requested
+        newGenerationType = input.generationType === 'both' ? 'both' : 'resume';
       }
-
+      
       // If both were originally requested and both are missing, ask for both again.
       if (needsResume && !output?.customizedResume && needsCoverLetter && !output?.coverLetter) {
         newGenerationType = 'both';
