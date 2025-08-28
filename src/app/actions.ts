@@ -36,6 +36,10 @@ export async function handleTailorResumeAction(
       generationType: validation.data.generationType,
     });
     
+    if (!result.customizedResume && !result.coverLetter) {
+        return { success: false, error: "Failed to generate any documents. Please try again." };
+    }
+    
     return { success: true, data: result };
   } catch (e: any) {
     console.error(e);

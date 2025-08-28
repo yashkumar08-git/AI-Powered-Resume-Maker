@@ -106,15 +106,10 @@ const tailorResumeFlow = ai.defineFlow(
     if (!output) {
       throw new Error("Failed to generate the requested documents.");
     }
+    
     // Ensure that at least one of the requested documents has been generated
-    if (input.generationType === 'resume' && !output.customizedResume) {
-        throw new Error("The resume could not be generated.");
-    }
-    if (input.generationType === 'coverLetter' && !output.coverLetter) {
-        throw new Error("The cover letter could not be generated.");
-    }
-     if (input.generationType === 'both' && (!output.customizedResume || !output.coverLetter)) {
-        throw new Error("One or more documents could not be generated.");
+    if (!output.customizedResume && !output.coverLetter) {
+      throw new Error("No documents could be generated from the provided input.");
     }
 
     return output;
