@@ -63,7 +63,7 @@ export async function tailorResume(input: TailorResumeInput): Promise<TailorResu
 
 const tailorResumePrompt = ai.definePrompt({
     name: 'tailorResumePrompt',
-    model: 'googleai/gemini-1.5-flash-latest',
+    model: 'googleai/gemini-1.5-flash',
     input: {schema: TailorResumeInputSchema},
     output: {schema: TailorResumeOutputSchema},
     prompt: `You are an expert resume writer and career advisor. Your task is to generate a resume AND a cover letter based on the provided information.
