@@ -68,7 +68,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex items-center justify-center min-h-full p-4 sm:p-6 md:p-12">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm animate-fade-in-up shadow-2xl shadow-primary/10 bg-gradient-to-br from-card to-background/50 transition-all duration-300 hover:shadow-primary/20">
         <CardHeader>
           <CardTitle className="text-2xl">Sign Up</CardTitle>
           <CardDescription>
