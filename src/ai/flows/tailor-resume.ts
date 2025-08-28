@@ -95,24 +95,15 @@ const tailorResumeFlow = ai.defineFlow(
     outputSchema: TailorResumeOutputSchema,
   },
   async (input) => {
-    // To optimize, don't pass the full photo data to the model if it's very large.
-    // The prompt instructs the model to just pass it through, so we can handle it here.
-    const { photoDataUri, ...restOfInput } = input;
-    let promptInput = { ...restOfInput } as TailorResumeInput;
-    // A simplified placeholder to indicate a photo exists without sending the whole thing.
-    if (photoDataUri) {
-      promptInput.photoDataUri = 'photo-provided-in-input';
-    }
-
-    const result = await tailorResumePrompt(promptInput);
+    const result = await tailorResumePrompt(input);
     const output = result.output;
     if (!output) {
       throw new Error("Failed to generate the resume and cover letter.");
     }
     
-    // Restore the original photo URI in the final output
-    if (photoDataUri) {
-      output.customizedResume.photoDataUri = photoDataUri;
+    // Restore the original photo URI in the final output if the model misses it
+    if (input.photoDataUri && !output.customizedResume.photoDataUri) {
+      output.customizedResume.photoDataUri = input.photoDataUri;
     }
     
     return output;
