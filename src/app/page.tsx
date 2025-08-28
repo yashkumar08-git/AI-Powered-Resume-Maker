@@ -302,7 +302,7 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
-                <Accordion type="multiple" className="w-full" defaultValue={['item-2', 'item-3', 'item-4']}>
+                <Accordion type="multiple" className="w-full" defaultValue={[]}>
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-xl font-semibold"><FileText className="text-primary mr-3" /> Personal Information</AccordionTrigger>
                   <AccordionContent className="space-y-4 p-4 bg-accent/30 rounded-md">
