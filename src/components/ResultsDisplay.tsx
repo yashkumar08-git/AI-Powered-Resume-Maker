@@ -19,12 +19,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, Mail, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2, Save, Loader } from "lucide-react";
+import { Download, Copy, FileImage, FileType, Briefcase, GraduationCap, Star, User, MapPin, Link as LinkIcon, Mail as MailIcon, Phone, Globe, Linkedin, FilePlus2, Save, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -48,8 +46,7 @@ interface ResultsDisplayProps {
 export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
   const { toast } = useToast();
   const resumeRef = useRef<HTMLDivElement>(null);
-  const coverLetterRef = useRef<HTMLDivElement>(null);
-  const { customizedResume, coverLetter } = result;
+  const { customizedResume } = result;
   const [activeTemplate, setActiveTemplate] = useState<Template>('modern');
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -246,14 +243,13 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
 
   return (
     <div className="w-full animate-fade-in-up">
-      <Tabs defaultValue="resume" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <div className="flex-1">
              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                Your Customized Documents
+                Your Customized Resume
             </h2>
             <p className="text-muted-foreground mt-1">
-                Your resume and cover letter are ready.
+                Your resume is ready.
             </p>
           </div>
          
@@ -309,19 +305,8 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
                 activeTemplate={activeTemplate}
                 onTemplateChange={setActiveTemplate}
               />
-            <TabsList className="grid w-full grid-cols-2 sm:w-auto">
-              <TabsTrigger value="resume">
-                <FileText className="mr-2 h-4 w-4" />
-                Resume
-              </TabsTrigger>
-              <TabsTrigger value="cover-letter">
-                <Mail className="mr-2 h-4 w-4" />
-                Letter
-              </TabsTrigger>
-            </TabsList>
           </div>
         </div>
-        <TabsContent value="resume">
           <Card className="shadow-none bg-white/5">
             <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b">
               <div className="flex-1">
@@ -402,30 +387,6 @@ export function ResultsDisplay({ result, onStartOver }: ResultsDisplayProps) {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="cover-letter">
-          <Card className="shadow-none bg-white/5">
-            <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b">
-              <div>
-                <CardTitle>Cover Letter</CardTitle>
-                <CardDescription>
-                  A compelling letter to introduce yourself.
-                </CardDescription>
-              </div>
-               <DocumentActions filename="cover-letter" contentRef={coverLetterRef} />
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="p-2 sm:p-8 bg-transparent max-h-[80vh] overflow-y-auto">
-                <div ref={coverLetterRef} className="p-6 sm:p-12 bg-white text-gray-800 shadow-2xl rounded-lg max-w-4xl mx-auto font-sans leading-relaxed">
-                  <pre className="text-sm sm:text-base whitespace-pre-wrap font-sans">
-                    {coverLetter}
-                  </pre>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }

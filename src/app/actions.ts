@@ -39,7 +39,7 @@ export async function handleTailorResumeAction(
     console.error(e);
     // Provide a more specific error message to the user.
     const errorMessage = e.message || "An unexpected error occurred. Please try again later.";
-    return { success: false, error: `Failed to generate documents: ${errorMessage}` };
+    return { success: false, error: `Failed to generate resume: ${errorMessage}` };
   }
 }
 

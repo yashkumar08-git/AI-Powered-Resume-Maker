@@ -2,9 +2,9 @@
 'use server';
 
 /**
- * @fileOverview An AI agent that customizes a resume and generates a cover letter.
+ * @fileOverview An AI agent that customizes a resume.
  *
- * - tailorResume - A function that handles the resume customization and cover letter generation.
+ * - tailorResume - A function that handles the resume customization.
  * - TailorResumeInput - The input type for the tailorResume function.
  * - TailorResumeOutput - The return type for the tailorResume function.
  */
@@ -48,7 +48,6 @@ const ResumeSchema = z.object({
 
 const TailorResumeOutputSchema = z.object({
   customizedResume: ResumeSchema.describe('The customized resume, structured as a JSON object.'),
-  coverLetter: z.string().describe('A cover letter for the job.'),
 });
 export type TailorResumeOutput = z.infer<typeof TailorResumeOutputSchema>;
 
@@ -66,13 +65,13 @@ const tailorResumePrompt = ai.definePrompt({
     model: 'googleai/gemini-1.5-flash',
     input: {schema: TailorResumeInputSchema},
     output: {schema: TailorResumeOutputSchema},
-    prompt: `You are an expert resume writer and career advisor. Your task is to generate a resume AND a cover letter based on the provided information.
+    prompt: `You are an expert resume writer and career advisor. Your task is to generate a resume based on the provided information.
 
 Your output MUST be a single JSON object that conforms to the provided JSON schema. Do not add any extra text or markdown formatting around the JSON object.
 
-If the user provides a resume and/or a job description, you will customize the resume to the job description, highlighting relevant skills and experience, and write a compelling cover letter.
+If the user provides a resume and/or a job description, you will customize the resume to the job description, highlighting relevant skills and experience.
 
-If the user provides an empty resume and an empty job description, you MUST generate a high-quality, complete sample resume AND a sample cover letter for a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
+If the user provides an empty resume and an empty job description, you MUST generate a high-quality, complete sample resume for a fictional person named "Alex Doe" applying for a "Senior Software Engineer" position at a top tech company.
 
 If a photo is provided in the input, you MUST include the original photo's data URI in the 'photoDataUri' field of the resume object. Do not process or change the photo data URI.
 
@@ -98,7 +97,7 @@ const tailorResumeFlow = ai.defineFlow(
     const result = await tailorResumePrompt(input);
     const output = result.output;
     if (!output) {
-      throw new Error("Failed to generate the resume and cover letter.");
+      throw new Error("Failed to generate the resume.");
     }
     return output;
   }

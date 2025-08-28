@@ -208,7 +208,7 @@ export default function Home() {
     if (response.success && response.data) {
       toast({
         title: "Success!",
-        description: "Your customized documents have been generated.",
+        description: "Your customized resume has been generated.",
       });
       // Store result in local storage and redirect
       const resultData = { ...response.data, id: values.id };
@@ -323,7 +323,7 @@ export default function Home() {
                           )}
                         />
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FormField
+                          <FormField  
                             control={form.control}
                             name="location"
                             render={({ field }) => (
