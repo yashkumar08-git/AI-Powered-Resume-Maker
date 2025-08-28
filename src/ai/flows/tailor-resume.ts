@@ -117,8 +117,19 @@ const tailorResumeFlow = ai.defineFlow(
       // Create a new input for the retry, asking for the missing piece.
       const retryInput: TailorResumeInput = { ...input };
       const missingParts: string[] = [];
-      if (!output?.customizedResume) missingParts.push('resume');
-      if (!output?.coverLetter) missingParts.push('cover letter');
+      if (!output?.customizedResume) {
+        missingParts.push('resume');
+        retryInput.generationType = 'resume';
+      }
+      if (!output?.coverLetter) {
+        missingParts.push('cover letter');
+        retryInput.generationType = 'coverLetter';
+      }
+
+      if (missingParts.length === 2) {
+        retryInput.generationType = 'both';
+      }
+
 
       retryInput.resume = `Original Resume: ${input.resume}\nOriginal Job Description: ${input.jobDescription}\nPREVIOUSLY GENERATED: ${JSON.stringify(output || {}, null, 2)}\n\nYou failed to generate all the required documents. Please generate the missing parts: ${missingParts.join(' and ')}.`;
       
@@ -151,7 +162,7 @@ const tailorResumeFlow = ai.defineFlow(
         throw new Error("The resume could not be generated.");
     }
     if (input.generationType === 'coverLetter' && !output.coverLetter) {
-        throw new Error("The cover letter cound not be generated.");
+        throw new Error("The cover letter could not be generated.");
     }
      if (!output.customizedResume && !output.coverLetter) {
       throw new Error("No documents could be generated from the provided input.");
